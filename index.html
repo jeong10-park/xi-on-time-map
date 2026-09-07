@@ -114,11 +114,12 @@
   .nav-item.active{background:var(--sidebar-active); color:#fff;}
   .nav-item.active .ic{opacity:1;}
   .nav-item .badge{
-    margin-left:auto; font-size:9.5px; font-weight:700; letter-spacing:0.03em;
-    padding:2px 6px; border-radius:99px; background:rgba(255,255,255,0.1); color:var(--sidebar-text-dim);
+    margin-left:auto; font-size:9.5px; font-weight:800; letter-spacing:0.03em;
+    padding:2px 7px; border-radius:99px; background:rgba(255,255,255,0.18); color:#fff;
   }
-  .nav-item.disabled{opacity:.55; cursor:default;}
-  .nav-item.disabled:hover{background:none; color:var(--sidebar-text);}
+  .nav-item.disabled{cursor:default; color:var(--sidebar-text-dim);}
+  .nav-item.disabled .ic{opacity:.45;}
+  .nav-item.disabled:hover{background:none; color:var(--sidebar-text-dim);}
 
   .sidebar-foot{
     padding:14px; margin:8px 12px 16px; border-radius:10px;
@@ -435,7 +436,7 @@
       <button class="nav-item disabled" data-page="overview" title="다음 단계에서 작업 예정">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
         Overview
-        <span class="badge">다음 단계</span>
+        <span class="badge">TBU</span>
       </button>
       <button class="nav-item" data-page="social-buzz">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM8 12v3a5 5 0 0 0 5 5"/><circle cx="16" cy="6" r="2.2"/></svg>
@@ -449,9 +450,10 @@
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
         Seoul Apartment Index
       </button>
-      <button class="nav-item" data-page="index-survey">
+      <button class="nav-item disabled" data-page="index-survey" title="다음 단계에서 작업 예정">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
         Index Survey
+        <span class="badge">TBU</span>
       </button>
     </nav>
 
@@ -466,10 +468,9 @@
     <section class="page" id="page-social-buzz">
       <div class="topbar">
         <div>
-          <div class="crumb">모니터링 · Social Buzz</div>
           <div class="page-title">Social Buzz</div>
           <div class="page-desc">페이지·카페·블로그 3개 채널 버즈량·감성·이슈를 자체 수집 데이터로 분석합니다.</div>
-          <div class="sb-note">※ 현재 Google Sheets 데이터로 연동 중입니다 · 사내망 접근성에 따라 Supabase 전환을 검토하고 있어요. [검증 필요]</div>
+          <div class="sb-note">네이버, 카카오의 카페, 블로그, 웹페이지 검색 결과 반영</div>
         </div>
         <div class="topbar-actions">
           <span class="sb-source-pill"><span class="dot"></span>Sheets 연동</span>
@@ -598,12 +599,7 @@
     <section class="page" id="page-press-board">
       <div class="topbar">
         <div>
-          <div class="crumb">외부 연동 · Press Board</div>
           <div class="page-title">Press Board</div>
-          <div class="page-desc">자이 언론 분석 플랫폼을 그대로 임베드합니다.</div>
-        </div>
-        <div class="topbar-actions">
-          <a class="btn" href="https://xi-signal.vercel.app/" target="_blank" rel="noopener">새 창에서 열기 ↗</a>
         </div>
       </div>
       <div class="embed-wrap">
@@ -616,12 +612,7 @@
     <section class="page" id="page-seoul-index">
       <div class="topbar">
         <div>
-          <div class="crumb">외부 연동 · Seoul Apartment Index</div>
           <div class="page-title">Seoul Apartment Index</div>
-          <div class="page-desc">서울 내 아파트 분포 및 현황 페이지를 그대로 임베드합니다.</div>
-        </div>
-        <div class="topbar-actions">
-          <a class="btn" href="https://dl-1-2-3-dl-4.vercel.app/?v=116" target="_blank" rel="noopener">새 창에서 열기 ↗</a>
         </div>
       </div>
       <div class="embed-wrap">
