@@ -589,7 +589,7 @@
         </div>
 
         <div class="sb-footer-note">
-          <span>수집 채널: 네이버 블로그·카페·웹문서 · 카카오 웹·블로그·카페 (뉴스 미수집)</span>
+          <span>이 화면 표시 채널: 페이지·카페·블로그 (뉴스는 별도 수집되나 이 화면엔 표시 안 함)</span>
           <span>Press Board(언론 분석)와는 별도로 독립 집계됩니다</span>
         </div>
       </div>
@@ -724,18 +724,18 @@
     '거주':     ['커뮤니티','조용','쾌적','경관','편의시설','주차','관리비','학군','녹지','스마트홈','입주민'],
     '브랜드':   ['브랜드','광고','마케팅','인지도','선호','이미지','리뉴얼','신규','론칭'],
     '민원':     ['민원','소송','분쟁','고소','국토부','감리','피해','항의','집단'],
-    '안전':     ['안전사고','화재','붕괴','낙하','감전','가스누출','안전점검','소방','대피','안전관리','추락'],
-    'ESG':      ['ESG','사회공헌','기부','봉사','친환경경영','탄소중립','지역사회','상생','나눔','후원','캠페인'],
+    '안전':     ['안전사고','화재','붕괴','침수','안전관리','안전점검','안전교육','내진','재해','대피'],
+    'ESG':      ['기부','봉사','사회공헌','ESG','친환경','탄소중립','탄소저감','상생','협력사'],
   };
   var TOPIC_LABEL = {'시공품질':'🔨 시공·품질','투자':'💰 투자·분양','거주':'🏠 거주환경','브랜드':'🏷️ 브랜드·PR','민원':'⚠️ 민원·이슈','안전':'🦺 안전','ESG':'🌱 ESG·사회공헌','기타':'기타'};
-  function classifyTopic(title, summary){
+  var TOPIC_ORDER = ['시공품질','투자','거주','브랜드','민원','안전','ESG'];
+  // 한 글이 여러 토픽에 동시에 걸릴 수 있어서 첫 매칭만 고르지 않고 해당되는 토픽을 전부 반환합니다.
+  function classifyTopics(title, summary){
     var t = (title||'') + ' ' + (summary||'');
-    var order = ['시공품질','투자','거주','브랜드','민원','안전','ESG'];
-    for(var i=0;i<order.length;i++){
-      var tp = order[i];
-      if(TOPIC_KW[tp].some(function(kw){ return t.indexOf(kw) !== -1; })) return tp;
-    }
-    return '기타';
+    var matched = TOPIC_ORDER.filter(function(tp){
+      return TOPIC_KW[tp].some(function(kw){ return t.indexOf(kw) !== -1; });
+    });
+    return matched.length ? matched : ['기타'];
   }
 
   // 상태
@@ -1014,7 +1014,7 @@
       if(curSentFilter==='xi') sOk = card.dataset.brand==='자이';
       else if(curSentFilter==='premium') sOk = card.dataset.premium==='Y';
       else if(curSentFilter!=='all') sOk = card.dataset.sent===curSentFilter;
-      if(curTopicFilter!=='all') tOk = card.dataset.topic===curTopicFilter;
+      if(curTopicFilter!=='all') tOk = card.dataset.topic.indexOf(','+curTopicFilter+',') !== -1;
       card.classList.toggle('hidden', !bOk||!sOk||!tOk);
     });
   }
@@ -1046,7 +1046,10 @@
           제목:(c[4]&&c[4].v)||'', 내용요약:(c[5]&&c[5].v)||'', 감성:(c[6]&&c[6].v)||'중립',
           원문URL:(c[7]&&c[7].v)||'', 댓글수:(c[8]&&c[8].v)||'', 프리미엄:(c[9]&&c[9].v)||'',
         };
-      }).filter(function(i){ return i.제목 && (!i.작성일 || i.작성일>=DATA_FROM) && BRANDS.indexOf(i.브랜드)!==-1; });
+      }).filter(function(i){
+        var isNews = i.채널 && i.채널.indexOf('뉴스') !== -1; // 뉴스는 수집은 되지만 이 페이지엔 표시 안 함
+        return i.제목 && !isNews && (!i.작성일 || i.작성일>=DATA_FROM) && BRANDS.indexOf(i.브랜드)!==-1;
+      });
       allItems = items;
 
       BRANDS.forEach(function(b){ SOV.all[b]=0; });
@@ -1120,7 +1123,8 @@
         var i = lb[b], isXi = b==='자이';
         var sc = i.감성==='긍정'?'sb-s-pos':i.감성==='부정'?'sb-s-neg':'sb-s-neu';
         var se = i.감성==='긍정'?'🟢 긍정':i.감성==='부정'?'🔴 부정':'🟡 중립';
-        var topic = classifyTopic(i.제목, i.내용요약);
+        var topics = (i.topic && i.topic.length) ? i.topic : classifyTopics(i.제목, i.내용요약); // Supabase 전환 후엔 저장된 값 그대로 사용
+        var topicBadges = topics.map(function(tp){ return '<span class="sb-topic-badge">'+(TOPIC_LABEL[tp]||tp)+'</span>'; }).join('');
         var urlHtml = i.원문URL ? '<a href="'+i.원문URL+'" target="_blank" style="font-size:11px;color:var(--sb-xi);text-decoration:none;font-weight:700">원문 ↗</a>' : '';
         var premHtml = i.프리미엄==='Y' ? '<span style="font-size:10px;color:var(--sb-neu);border:1px solid #e7d9b8;padding:1px 6px;border-radius:6px">💎</span>' : '';
         var el = document.createElement('div');
@@ -1129,7 +1133,7 @@
         el.innerHTML =
           '<span class="sb-hot-brand-tag" style="color:'+(isXi?'var(--sb-xi)':BC[b])+'">'+b+(isXi?' ✦':'')+'</span>'+
           '<div class="sb-hot-title">'+i.제목.slice(0,80)+(i.제목.length>80?'...':'')+'</div>'+
-          '<div class="sb-hot-meta">'+premHtml+'<span class="sb-topic-badge">'+(TOPIC_LABEL[topic]||topic)+'</span><span class="sb-sent-badge '+sc+'">'+se+'</span><span class="sb-hot-ch">'+i.채널+'·'+i.작성일.slice(0,10)+'</span>'+urlHtml+'</div>';
+          '<div class="sb-hot-meta">'+premHtml+topicBadges+'<span class="sb-sent-badge '+sc+'">'+se+'</span><span class="sb-hot-ch">'+i.채널+'·'+i.작성일.slice(0,10)+'</span>'+urlHtml+'</div>';
         hotList.appendChild(el);
       });
 
@@ -1143,14 +1147,15 @@
         var sc = i.감성==='긍정'?'sb-s-pos':i.감성==='부정'?'sb-s-neg':'sb-s-neu';
         var se = i.감성==='긍정'?'🟢 긍정':i.감성==='부정'?'🔴 부정':'🟡 중립';
         var st = i.감성==='긍정'?'pos':i.감성==='부정'?'neg':'neu';
-        var topic = classifyTopic(i.제목, i.내용요약);
+        var topics = (i.topic && i.topic.length) ? i.topic : classifyTopics(i.제목, i.내용요약); // Supabase 전환 후엔 저장된 값 그대로 사용
+        var topicBadges = topics.map(function(tp){ return '<span class="sb-topic-badge">'+(TOPIC_LABEL[tp]||tp)+'</span>'; }).join('');
         var urlHtml = i.원문URL ? '<a href="'+i.원문URL+'" target="_blank" class="sb-feed-link">원문 ↗</a>' : '';
         var card = document.createElement('div');
         card.className = 'sb-feed-card' + (isXi?' sb-xi-card':'');
-        card.dataset.brand = i.브랜드; card.dataset.sent = st; card.dataset.topic = topic; card.dataset.premium = i.프리미엄 || '';
+        card.dataset.brand = i.브랜드; card.dataset.sent = st; card.dataset.topic = ','+topics.join(',')+','; card.dataset.premium = i.프리미엄 || '';
         card.innerHTML =
           '<div class="sb-feed-top"><span class="sb-feed-brand" style="color:'+(isXi?'var(--sb-xi)':BC[i.브랜드])+'">'+i.브랜드+(isXi?' ✦':'')+'</span><span class="sb-feed-time">'+timeAgo(i.작성일)+'</span></div>'+
-          '<div style="display:flex;gap:5px;flex-wrap:wrap"><span class="sb-sent-badge '+sc+'">'+se+'</span><span class="sb-topic-badge">'+(TOPIC_LABEL[topic]||topic)+'</span>'+
+          '<div style="display:flex;gap:5px;flex-wrap:wrap"><span class="sb-sent-badge '+sc+'">'+se+'</span>'+topicBadges+
           (i.프리미엄==='Y' ? '<span class="sb-topic-badge" style="border-color:#e7d9b8;color:var(--sb-neu)">💎 하이엔드</span>' : '')+'</div>'+
           '<div class="sb-feed-title">'+i.제목.slice(0,60)+(i.제목.length>60?'...':'')+'</div>'+
           (i.내용요약 ? '<div class="sb-feed-summary">'+i.내용요약.slice(0,70)+'...</div>' : '')+
