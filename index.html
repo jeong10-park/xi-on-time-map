@@ -2,6 +2,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
     --sidebar-bg:#101a38;
@@ -209,6 +211,213 @@
   }
 
   svg{display:block;}
+
+  /* ==================================================================
+     SOCIAL BUZZ — Press Board(xi-signal.vercel.app) 톤앤매너 적용
+  ================================================================== */
+  #page-social-buzz{
+    --sb-navy:#06364d; --sb-navy2:#0c4a64; --sb-ink:#17272f; --sb-muted:#6d7c84;
+    --sb-line:#dce4e7; --sb-surface:#f4f6f7; --sb-white:#ffffff;
+    --sb-xi:#1f5f8b; --sb-raemian:#009dad; --sb-hillstate:#a5103d;
+    --sb-shadow:0 12px 34px #0a304112;
+    --sb-radius-sm:8px; --sb-radius-md:14px; --sb-radius-lg:20px;
+    --sb-pos:#1f8a5f; --sb-pos-bg:#e9f5ef;
+    --sb-neg:#c14545; --sb-neg-bg:#fbecec;
+    --sb-neu:#b17f22; --sb-neu-bg:#faf3e3;
+  }
+  #page-social-buzz .page-scroll{
+    background:var(--sb-surface); padding:24px 32px 56px;
+    font-family:"Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI","Malgun Gothic",sans-serif;
+    color:var(--sb-ink);
+  }
+  #page-social-buzz .crumb{color:var(--sb-xi);}
+  #page-social-buzz .page-desc{color:var(--sb-muted);}
+  #page-social-buzz .sb-note{font-size:11.5px; color:var(--sb-muted); margin-top:6px;}
+
+  .sb-source-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:11px; font-weight:700; color:var(--sb-navy2); background:#e7eef1;
+    border:1px solid var(--sb-line); padding:4px 10px; border-radius:99px;
+  }
+  .sb-source-pill .dot{width:6px; height:6px; border-radius:99px; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,0.18);}
+
+  .sb-section{margin-bottom:30px;}
+  .sb-section-label{
+    font-size:14px; font-weight:800; color:var(--sb-navy); margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .sb-section-label .tag{
+    font-family:ui-monospace,"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+    color:var(--sb-muted); border:1px solid var(--sb-line); padding:1px 7px; border-radius:10px;
+  }
+
+  .sb-brand-filter{display:flex; align-items:center; gap:7px; margin-bottom:24px; flex-wrap:wrap;}
+  .sb-bf-label{font-size:11px; color:var(--sb-muted); text-transform:uppercase; letter-spacing:.06em; font-weight:700;}
+  .sb-bf-tag{
+    font-size:12px; padding:5px 12px; border-radius:20px; border:1px solid var(--sb-line);
+    color:var(--sb-muted); cursor:pointer; background:var(--sb-white); font-family:inherit;
+    display:flex; align-items:center; gap:6px; transition:all .15s;
+  }
+  .sb-bf-tag .dot{width:7px; height:7px; border-radius:50%; flex-shrink:0;}
+  .sb-bf-tag.active{background:#eef3f5; border-color:var(--sb-navy2); color:var(--sb-ink); font-weight:600;}
+
+  .sb-card{
+    background:var(--sb-white); border:1px solid var(--sb-line); border-radius:var(--sb-radius-md);
+    padding:20px; box-shadow:var(--sb-shadow);
+  }
+  .sb-card-title{
+    font-size:11px; color:var(--sb-muted); margin-bottom:16px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .sb-xi-card{border-color:rgba(31,95,139,0.35)!important; background:linear-gradient(145deg,rgba(31,95,139,0.05),var(--sb-white))!important;}
+
+  .sb-sov-grid{display:grid; grid-template-columns:270px 1fr; gap:14px;}
+  .sb-donut-wrap{position:relative; width:150px; height:150px; margin:0 auto 18px;}
+  .sb-donut-wrap svg{width:100%; height:100%; transform:rotate(-90deg);}
+  .sb-donut-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .sb-donut-total{font-size:22px; font-weight:800; font-family:ui-monospace,"JetBrains Mono",monospace; color:var(--sb-navy);}
+  .sb-donut-unit{font-size:10px; color:var(--sb-muted); margin-top:1px;}
+  .sb-legend{display:flex; flex-direction:column; gap:6px;}
+  .sb-legend-item{display:flex; align-items:center; justify-content:space-between; font-size:12px;}
+  .sb-legend-left{display:flex; align-items:center; gap:7px;}
+  .sb-legend-dot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
+  .sb-legend-name{color:var(--sb-ink);}
+  .sb-legend-pct{font-family:ui-monospace,"JetBrains Mono",monospace; font-size:12px; font-weight:700; color:var(--sb-navy);}
+
+  .sb-sov-right{display:flex; flex-direction:column; gap:14px;}
+  .sb-area-wrap{position:relative; height:190px;}
+  .sb-area-legend{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .sb-area-leg-item{display:flex; align-items:center; gap:4px; font-size:11px; color:var(--sb-muted);}
+  .sb-area-leg-dot{width:7px; height:7px; border-radius:2px; flex-shrink:0;}
+
+  .sb-kw-bar-wrap{display:flex; gap:5px; flex-wrap:wrap; margin-bottom:12px;}
+  .sb-kw-btn{
+    font-size:11px; padding:4px 11px; border-radius:16px; border:1px solid var(--sb-line);
+    color:var(--sb-muted); cursor:pointer; background:var(--sb-white); font-family:inherit; transition:all .15s;
+  }
+  .sb-kw-btn.active{border-color:var(--sb-xi); color:var(--sb-xi); background:#eaf1f5; font-weight:700;}
+  .sb-brand-kw-list{display:flex; flex-direction:column; gap:8px;}
+  .sb-brand-kw-item{display:flex; align-items:flex-start; gap:10px;}
+  .sb-brand-kw-name{font-size:11px; color:var(--sb-ink); min-width:72px; padding-top:2px; flex-shrink:0; font-weight:600;}
+  .sb-brand-kw-chips{display:flex; gap:4px; flex-wrap:wrap;}
+  .sb-brand-chip{font-size:10px; padding:2px 8px; border-radius:8px; border:1px solid var(--sb-line); color:var(--sb-muted); background:#fafbfb;}
+  .sb-brand-chip.xi{border-color:rgba(31,95,139,0.4); color:var(--sb-xi); background:#eaf1f5;}
+  .sb-divider{border-top:1px solid var(--sb-line);}
+
+  .sb-sent-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+  .sb-sent-card{background:var(--sb-white); border:1px solid var(--sb-line); border-radius:var(--sb-radius-sm); padding:18px; box-shadow:var(--sb-shadow);}
+  .sb-sent-card-title{font-size:13px; font-weight:700; color:var(--sb-ink); margin-bottom:14px;}
+  .sb-sent-donut-wrap{position:relative; width:80px; height:80px; margin:0 auto 12px;}
+  .sb-sent-donut-wrap svg{width:100%; height:100%; transform:rotate(-90deg);}
+  .sb-sent-donut-center{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;}
+  .sb-sent-legend{display:flex; flex-direction:column; gap:5px;}
+  .sb-sent-legend-item{display:flex; justify-content:space-between; font-size:11px;}
+
+  .sb-health-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  .sb-health-card{background:var(--sb-white); border:1px solid var(--sb-line); border-radius:var(--sb-radius-sm); padding:16px; box-shadow:var(--sb-shadow); transition:border-color .15s;}
+  .sb-health-card:hover{border-color:var(--sb-navy2);}
+  .sb-health-brand{font-size:12px; font-weight:700; margin-bottom:11px; display:flex; align-items:center; gap:6px; color:var(--sb-ink);}
+  .sb-health-score-total{font-size:26px; font-weight:800; font-family:ui-monospace,"JetBrains Mono",monospace; margin-bottom:1px; line-height:1;}
+  .sb-health-score-label{font-size:10px; color:var(--sb-muted); margin-bottom:11px;}
+  .sb-factor-list{display:flex; flex-direction:column; gap:7px;}
+  .sb-factor-item{display:flex; flex-direction:column; gap:3px; position:relative;}
+  .sb-factor-top{display:flex; justify-content:space-between; align-items:center;}
+  .sb-factor-name{font-size:10px; color:var(--sb-muted);}
+  .sb-factor-val{font-size:10px; font-family:ui-monospace,"JetBrains Mono",monospace; color:var(--sb-ink);}
+  .sb-factor-bar{height:3px; background:#e7ebec; border-radius:2px;}
+  .sb-factor-fill{height:100%; border-radius:2px; transition:width .6s ease;}
+  .sb-factor-detail-tip{
+    display:none; position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%); z-index:40;
+    background:var(--sb-navy); border:1px solid var(--sb-navy2); border-radius:9px; padding:9px 13px;
+    font-size:10px; font-family:ui-monospace,"JetBrains Mono",monospace; color:#eaf1f5; white-space:nowrap;
+    box-shadow:0 6px 24px rgba(6,54,77,0.35); pointer-events:none; line-height:1.6;
+  }
+  .sb-factor-detail-tip::after{content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:var(--sb-navy);}
+  .sb-factor-item:hover .sb-factor-detail-tip{display:block;}
+
+  .sb-tooltip-wrap{position:relative; display:inline-flex; align-items:center;}
+  .sb-tooltip-icon{
+    display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%;
+    border:1px solid var(--sb-line); color:var(--sb-muted); font-size:9px; cursor:help; font-family:ui-monospace,monospace; flex-shrink:0;
+  }
+  .sb-tooltip-icon:hover{border-color:var(--sb-xi); color:var(--sb-xi);}
+  .sb-tooltip-box{
+    display:none; position:absolute; top:calc(100% + 10px); left:0; z-index:30; background:var(--sb-white);
+    border:1px solid var(--sb-line); border-radius:13px; padding:18px; width:360px; box-shadow:var(--sb-shadow);
+    font-size:11px; line-height:1.75; color:var(--sb-muted);
+  }
+  .sb-tooltip-wrap:hover .sb-tooltip-box{display:block;}
+  .sb-tooltip-factor{margin-bottom:11px;}
+  .sb-tooltip-factor:last-of-type{margin-bottom:0;}
+  .sb-tooltip-factor-name{font-size:12px; font-weight:700; color:var(--sb-ink); margin-bottom:3px;}
+  .sb-tooltip-kws{font-size:10px; color:var(--sb-muted); font-family:ui-monospace,monospace; line-height:1.9;}
+  .sb-tooltip-divider{border-top:1px solid var(--sb-line); margin:12px 0;}
+  .sb-tooltip-logic{font-size:10px; color:var(--sb-muted); line-height:1.8;}
+
+  .sb-buzz-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  .sb-buzz-card{background:var(--sb-white); border:1px solid var(--sb-line); border-radius:var(--sb-radius-sm); padding:16px; box-shadow:var(--sb-shadow);}
+  .sb-buzz-brand{font-size:12px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:6px; color:var(--sb-ink);}
+  .sb-buzz-count{font-size:24px; font-weight:800; font-family:ui-monospace,"JetBrains Mono",monospace; margin-bottom:10px; line-height:1;}
+  .sb-buzz-sent-row{display:flex; gap:7px; flex-wrap:wrap;}
+  .sb-buzz-sent-item{font-size:10px; color:var(--sb-muted);}
+  .sb-buzz-sent-item span{font-family:ui-monospace,monospace; color:var(--sb-ink);}
+  .sb-buzz-bar-stack{height:3px; border-radius:2px; display:flex; overflow:hidden; margin-top:9px; gap:1px;}
+  .sb-bstack-pos{background:var(--sb-pos);} .sb-bstack-neg{background:var(--sb-neg);} .sb-bstack-neu{background:var(--sb-neu);}
+
+  .sb-hot-list{display:flex; flex-direction:column; gap:8px;}
+  .sb-hot-item{
+    background:var(--sb-white); border:1px solid var(--sb-line); border-radius:var(--sb-radius-sm); padding:13px 18px;
+    display:flex; align-items:center; gap:14px; box-shadow:var(--sb-shadow); transition:border-color .15s;
+  }
+  .sb-hot-item:hover{border-color:var(--sb-navy2);}
+  .sb-hot-item.hidden{display:none;}
+  .sb-hot-brand-tag{font-size:12px; font-weight:800; min-width:72px; flex-shrink:0;}
+  .sb-hot-title{font-size:13px; color:var(--sb-ink); flex:1; line-height:1.45;}
+  .sb-hot-meta{display:flex; gap:6px; align-items:center; flex-shrink:0; flex-wrap:wrap;}
+  .sb-hot-ch{font-size:10px; color:var(--sb-muted); font-family:ui-monospace,monospace;}
+
+  .sb-topic-filter{display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;}
+  .sb-topic-btn{
+    font-size:12px; padding:5px 13px; border-radius:16px; border:1px solid var(--sb-line);
+    color:var(--sb-muted); cursor:pointer; background:var(--sb-white); font-family:inherit; transition:all .15s;
+  }
+  .sb-topic-btn.active{background:#eaf1f5; border-color:var(--sb-xi); color:var(--sb-xi); font-weight:700;}
+  .sb-feed-filter{display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap;}
+  .sb-filter-btn{
+    font-size:12px; padding:5px 13px; border-radius:16px; border:1px solid var(--sb-line);
+    color:var(--sb-muted); cursor:pointer; background:var(--sb-white); font-family:inherit; transition:all .15s;
+  }
+  .sb-filter-btn.active{background:#eaf1f5; border-color:var(--sb-xi); color:var(--sb-xi); font-weight:700;}
+
+  .sb-feed-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .sb-feed-card{
+    background:var(--sb-white); border:1px solid var(--sb-line); border-radius:var(--sb-radius-sm); padding:16px;
+    display:flex; flex-direction:column; gap:8px; box-shadow:var(--sb-shadow); transition:border-color .15s;
+  }
+  .sb-feed-card:hover{border-color:var(--sb-navy2);}
+  .sb-feed-card.hidden{display:none;}
+  .sb-feed-top{display:flex; justify-content:space-between; align-items:center;}
+  .sb-feed-brand{font-size:12px; font-weight:800;}
+  .sb-feed-time{font-size:10px; color:var(--sb-muted); font-family:ui-monospace,monospace;}
+  .sb-feed-title{font-size:13px; color:var(--sb-ink); line-height:1.55; font-weight:600;}
+  .sb-feed-summary{font-size:11px; color:var(--sb-muted); line-height:1.5;}
+  .sb-feed-bottom{display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:auto;}
+  .sb-feed-ch{font-size:10px; color:var(--sb-muted);}
+  .sb-feed-link{font-size:10px; color:var(--sb-xi); text-decoration:none; margin-left:auto; font-weight:700;}
+  .sb-sent-badge{font-size:10px; padding:2px 8px; border-radius:8px; font-weight:700;}
+  .sb-s-pos{background:var(--sb-pos-bg); color:var(--sb-pos);}
+  .sb-s-neg{background:var(--sb-neg-bg); color:var(--sb-neg);}
+  .sb-s-neu{background:var(--sb-neu-bg); color:var(--sb-neu);}
+  .sb-topic-badge{font-size:10px; padding:2px 7px; border-radius:6px; border:1px solid var(--sb-line); color:var(--sb-muted); font-family:ui-monospace,monospace;}
+
+  .sb-footer-note{
+    border-top:1px solid var(--sb-line); margin-top:8px; padding-top:14px;
+    font-size:11px; color:var(--sb-muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;
+  }
+
+  @media(max-width:1200px){.sb-health-grid{grid-template-columns:repeat(4,1fr);} .sb-buzz-grid{grid-template-columns:repeat(4,1fr);}}
+  @media(max-width:1000px){.sb-sov-grid{grid-template-columns:1fr;} .sb-health-grid{grid-template-columns:repeat(3,1fr);} .sb-buzz-grid{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:900px){.sb-sent-grid{grid-template-columns:repeat(2,1fr);} .sb-feed-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 
 <div class="app">
@@ -259,39 +468,128 @@
         <div>
           <div class="crumb">모니터링 · Social Buzz</div>
           <div class="page-title">Social Buzz</div>
-          <div class="page-desc">SNS 채널 버즈량·감성·이슈를 서드파티 정제 데이터 API로 연동할 예정입니다.</div>
+          <div class="page-desc">페이지·카페·블로그 3개 채널 버즈량·감성·이슈를 자체 수집 데이터로 분석합니다.</div>
+          <div class="sb-note">※ 현재 Google Sheets 데이터로 연동 중입니다 · 사내망 접근성에 따라 Supabase 전환을 검토하고 있어요. [검증 필요]</div>
         </div>
         <div class="topbar-actions">
-          <span class="pending-pill">API 연동 대기</span>
+          <span class="sb-source-pill"><span class="dot"></span>Sheets 연동</span>
+          <span id="sbUpdateTime" class="pending-pill" style="color:var(--text-secondary); background:var(--content-bg);"></span>
         </div>
       </div>
       <div class="page-scroll">
-        <div class="status-strip">
-          <span class="tag">Draft</span>
-          <span>이 페이지는 <strong>레이아웃 골격</strong>입니다. 서드파티 API 데이터 구성 공유 후 실제 수치로 교체됩니다.</span>
-        </div>
 
-        <div class="section-heading"><span class="n">1</span>SOV & 감성 요약</div>
-        <div class="grid cols-4">
-          <div class="card skeleton"><div class="card-eyebrow">Share of Voice</div><div class="card-title">연동 예정</div><div class="card-body">브랜드별 언급 점유율 도넛 + 추이</div></div>
-          <div class="card skeleton"><div class="card-eyebrow">감성별 SOV</div><div class="card-title">연동 예정</div><div class="card-body">긍정 · 중립 · 부정 비중</div></div>
-          <div class="card skeleton"><div class="card-eyebrow">전체 버즈량</div><div class="card-title">연동 예정</div><div class="card-body">기간 내 총 언급 건수</div></div>
-          <div class="card skeleton"><div class="card-eyebrow">채널 구성</div><div class="card-title">연동 예정</div><div class="card-body">뉴스 · 블로그 · 카페 · 커뮤니티</div></div>
-        </div>
+        <div class="sb-brand-filter" id="sbBrandFilter"></div>
 
-        <div class="section-heading"><span class="n">2</span>브랜드별 버즈량 &amp; Hot 이슈</div>
-        <div class="grid cols-2">
-          <div class="card skeleton" style="min-height:120px"><div class="card-eyebrow">브랜드별 버즈량 카드</div><div class="card-title">연동 예정</div><div class="card-body">자이 · 래미안 · 디에이치 · 아크로 등 경쟁 브랜드 비교</div></div>
-          <div class="card skeleton" style="min-height:120px"><div class="card-eyebrow">Hot 이슈</div><div class="card-title">연동 예정</div><div class="card-body">브랜드별 급상승 이슈 Top N</div></div>
-        </div>
-
-        <div class="section-heading"><span class="n">3</span>전체 피드</div>
-        <div class="card">
-          <div class="card-eyebrow">최신 24개 · 연동 예정</div>
-          <div style="margin-top:8px;">
-            <div class="feed-row"><span class="feed-dot"></span><span class="feed-text">서드파티 API 연동 후 실시간 피드가 이 영역에 표시됩니다.</span></div>
-            <div class="feed-row"><span class="feed-dot"></span><span class="feed-text">데이터 구성(컬럼/필드) 공유해 주시면 바로 붙일 수 있어요.</span></div>
+        <!-- 01 SOV -->
+        <div class="sb-section">
+          <div class="sb-section-label">📊 온라인 버즈 점유율 (SOV) <span class="tag">01</span></div>
+          <div class="sb-sov-grid">
+            <div class="sb-card">
+              <div class="sb-card-title">전체 버즈 SOV</div>
+              <div class="sb-donut-wrap">
+                <svg viewBox="0 0 100 100" id="sbMainDonutSvg"></svg>
+                <div class="sb-donut-center">
+                  <div class="sb-donut-total" id="sbDonutTotal">-</div>
+                  <div class="sb-donut-unit">건 (전체)</div>
+                  <div id="sbDonutPeriod" style="font-size:9px;color:var(--sb-muted);margin-top:3px;line-height:1.4;text-align:center;"></div>
+                </div>
+              </div>
+              <div class="sb-legend" id="sbMainLegend"></div>
+            </div>
+            <div class="sb-sov-right">
+              <div class="sb-card">
+                <div class="sb-card-title">주차별 SOV 추이</div>
+                <div class="sb-area-wrap"><canvas id="sbAreaChart"></canvas></div>
+                <div class="sb-area-legend" id="sbAreaLegend"></div>
+              </div>
+              <div class="sb-card">
+                <div class="sb-card-title" style="margin-bottom:10px">연관 키워드 SOV</div>
+                <div class="sb-kw-bar-wrap">
+                  <button class="sb-kw-btn active" data-kw="all">전체</button>
+                  <button class="sb-kw-btn" data-kw="브랜드파워">🏆 브랜드 파워</button>
+                  <button class="sb-kw-btn" data-kw="시공품질">🔨 시공·품질</button>
+                  <button class="sb-kw-btn" data-kw="투자가치">💰 투자 가치</button>
+                  <button class="sb-kw-btn" data-kw="주거환경">🌿 주거 환경</button>
+                  <button class="sb-kw-btn" data-kw="스마트친환경">🤖 스마트·친환경</button>
+                </div>
+                <div id="sbKwSovChart"></div>
+                <div class="sb-divider" style="margin:16px 0"></div>
+                <div class="sb-card-title" style="margin-bottom:10px">브랜드별 핵심 키워드</div>
+                <div class="sb-brand-kw-list" id="sbBrandKwList"></div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <!-- 02 HEALTH -->
+        <div class="sb-section">
+          <div class="sb-section-label">🏆 브랜드 경쟁력 스코어 <span class="tag">02</span>
+            <div class="sb-tooltip-wrap">
+              <span class="sb-tooltip-icon">?</span>
+              <div class="sb-tooltip-box">
+                <div class="sb-tooltip-factor"><div class="sb-tooltip-factor-name">🏆 브랜드 파워</div><div class="sb-tooltip-kws">긍정 버즈 비율 × 0.6 + 전체 버즈 점유율 × 0.4<br>→ 브랜드 인지도·호감도 종합 지수</div></div>
+                <div class="sb-tooltip-factor"><div class="sb-tooltip-factor-name">🔨 시공·품질</div><div class="sb-tooltip-kws">하자 · 결함 · 균열 · 누수 · 곰팡이 · 결로 · 층간소음 · 부실<br>→ 부정 키워드 언급 비율이 낮을수록 고점</div></div>
+                <div class="sb-tooltip-factor"><div class="sb-tooltip-factor-name">💰 투자 가치</div><div class="sb-tooltip-kws">긍정: 청약 · 시세차익 · 상승 · 당첨 · 재건축 · 프리미엄 붙 · 분양 완판<br>부정: 미분양 · 입주 지연 · PF · 공사 중단<br>→ (긍정 − 부정) 버즈 차이로 산출</div></div>
+                <div class="sb-tooltip-factor"><div class="sb-tooltip-factor-name">🌿 주거 환경</div><div class="sb-tooltip-kws">긍정: 쾌적 · 조용 · 커뮤니티 좋 · 경관 좋 · 편의시설 · 학군 · 녹지<br>부정: 주차 부족 · 관리비 비싸 · 시끄럽 · 좁아<br>→ (긍정 − 부정) 버즈 차이로 산출</div></div>
+                <div class="sb-tooltip-factor"><div class="sb-tooltip-factor-name">🤖 스마트·친환경</div><div class="sb-tooltip-kws">스마트홈 · IoT · 친환경 · 에너지 · 공기질 · 스마트 케어<br>→ 관련 버즈 언급 비율로 산출</div></div>
+                <div class="sb-tooltip-divider"></div>
+                <div class="sb-tooltip-logic">📐 <strong style="color:var(--sb-ink)">산출 방식</strong><br>각 요인별 키워드를 포함한 버즈를 브랜드 전체 버즈 대비 비율로 계산 후 0–100점 환산.<br>5개 요인 단순 평균 = 종합 점수. <span style="color:var(--sb-xi)">[검증 필요: 자체 정의 스코어링]</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="sb-health-grid" id="sbHealthGrid"><div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:13px">📡 데이터 불러오는 중...</div></div>
+        </div>
+
+        <!-- 03 SENTIMENT -->
+        <div class="sb-section">
+          <div class="sb-section-label">🎭 감성별 버즈 점유율 <span class="tag">03</span></div>
+          <div class="sb-sent-grid">
+            <div class="sb-sent-card"><div class="sb-sent-card-title">📊 전체 SOV</div><div class="sb-sent-donut-wrap"><svg viewBox="0 0 80 80" id="sbSd0"></svg><div class="sb-sent-donut-center" style="color:var(--sb-ink)">전체</div></div><div class="sb-sent-legend" id="sbSl0"></div></div>
+            <div class="sb-sent-card"><div class="sb-sent-card-title">🟢 긍정 SOV</div><div class="sb-sent-donut-wrap"><svg viewBox="0 0 80 80" id="sbSd1"></svg><div class="sb-sent-donut-center" style="color:var(--sb-pos)">긍정</div></div><div class="sb-sent-legend" id="sbSl1"></div></div>
+            <div class="sb-sent-card"><div class="sb-sent-card-title">🔴 부정 SOV</div><div class="sb-sent-donut-wrap"><svg viewBox="0 0 80 80" id="sbSd2"></svg><div class="sb-sent-donut-center" style="color:var(--sb-neg)">부정</div></div><div class="sb-sent-legend" id="sbSl2"></div></div>
+            <div class="sb-sent-card"><div class="sb-sent-card-title">🟡 중립 SOV</div><div class="sb-sent-donut-wrap"><svg viewBox="0 0 80 80" id="sbSd3"></svg><div class="sb-sent-donut-center" style="color:var(--sb-neu)">중립</div></div><div class="sb-sent-legend" id="sbSl3"></div></div>
+          </div>
+        </div>
+
+        <!-- 04 BUZZ -->
+        <div class="sb-section">
+          <div class="sb-section-label">📣 브랜드별 버즈량 <span class="tag">04</span></div>
+          <div class="sb-buzz-grid" id="sbBuzzGrid"><div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--sb-muted);font-size:13px">📡 데이터 불러오는 중...</div></div>
+        </div>
+
+        <!-- 05 HOT -->
+        <div class="sb-section">
+          <div class="sb-section-label">🔥 브랜드별 최신 이슈 <span class="tag">05</span></div>
+          <div class="sb-hot-list" id="sbHotList"><div style="padding:20px;color:var(--sb-muted);font-size:13px">📡 데이터 불러오는 중...</div></div>
+        </div>
+
+        <!-- 06 FEED -->
+        <div class="sb-section">
+          <div class="sb-section-label">📋 전체 이슈 피드 <span class="tag">06</span></div>
+          <div class="sb-topic-filter">
+            <button class="sb-topic-btn active" data-topic="all">전체 토픽</button>
+            <button class="sb-topic-btn" data-topic="시공품질">🔨 시공·품질</button>
+            <button class="sb-topic-btn" data-topic="투자">💰 투자·분양</button>
+            <button class="sb-topic-btn" data-topic="거주">🏠 거주환경</button>
+            <button class="sb-topic-btn" data-topic="브랜드">🏷️ 브랜드·PR</button>
+            <button class="sb-topic-btn" data-topic="민원">⚠️ 민원·이슈</button>
+            <button class="sb-topic-btn" data-topic="안전">🦺 안전</button>
+            <button class="sb-topic-btn" data-topic="ESG">🌱 ESG·사회공헌</button>
+          </div>
+          <div class="sb-feed-filter">
+            <button class="sb-filter-btn active" data-sent="all">전체 감성</button>
+            <button class="sb-filter-btn" data-sent="pos">🟢 긍정</button>
+            <button class="sb-filter-btn" data-sent="neg">🔴 부정</button>
+            <button class="sb-filter-btn" data-sent="neu">🟡 중립</button>
+            <button class="sb-filter-btn" data-sent="xi">✦ 자이만</button>
+            <button class="sb-filter-btn" data-sent="premium">💎 하이엔드</button>
+          </div>
+          <div class="sb-feed-grid" id="sbFeedGrid"><div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:13px">📡 Google Sheets에서 데이터를 불러오는 중...</div></div>
+        </div>
+
+        <div class="sb-footer-note">
+          <span>수집 채널: 네이버 블로그·카페·웹문서 · 카카오 웹·블로그·카페 (뉴스 미수집)</span>
+          <span>Press Board(언론 분석)와는 별도로 독립 집계됩니다</span>
         </div>
       </div>
     </section>
@@ -403,4 +701,488 @@
       show((location.hash || '').replace('#',''));
     });
   })();
+</script>
+
+<!-- ===================== SOCIAL BUZZ LOGIC ===================== -->
+<script>
+(function(){
+  // ── 브랜드 컬러 (10개, Press Board 톤과 조화되는 뮤트 팔레트) ──
+  // 자이 · 힐스테이트 · 래미안은 Press Board 실제 색상 그대로 재사용
+  var BC = {
+    '자이':       '#1f5f8b',
+    '힐스테이트': '#a5103d',
+    '래미안':     '#009dad',
+    '롯데캐슬':   '#6b3f5e',
+    '아이파크':   '#c1523f',
+    '위브':       '#6a5a94',
+    '푸르지오':   '#4c7a5b',
+    '이편한세상': '#c17d2e',
+    '더샵':       '#5b8aa6',
+    'SK뷰':       '#8a3a3a',
+  };
+  var BRANDS = ['자이','힐스테이트','롯데캐슬','래미안','아이파크','위브','푸르지오','이편한세상','더샵','SK뷰'];
+
+  var SHEETS_ID   = '1CSjDf8z-XFSP3Fbk87hpCSY1WrQ3r55ff6cMP4RTfvM';
+  var SHEETS_BASE = 'https://docs.google.com/spreadsheets/d/' + SHEETS_ID + '/gviz/tq?tqx=out:json&sheet=피드';
+  var DATA_FROM   = '2025-01-01';
+
+  // 토픽 필터 — 기존 5개(시공품질/투자/거주/브랜드/민원) 그대로 + 안전 · ESG·사회공헌 신규 추가
+  var TOPIC_KW = {
+    '시공품질': ['하자','결함','균열','누수','곰팡이','결로','층간소음','부실','마감','시공','AS','하자보수'],
+    '투자':     ['청약','분양','시세','프리미엄','상승','투자','재건축','재개발','입주권','분양가','당첨'],
+    '거주':     ['커뮤니티','조용','쾌적','경관','편의시설','주차','관리비','학군','녹지','스마트홈','입주민'],
+    '브랜드':   ['브랜드','광고','마케팅','인지도','선호','이미지','리뉴얼','신규','론칭'],
+    '민원':     ['민원','소송','분쟁','고소','국토부','감리','피해','항의','집단'],
+    '안전':     ['안전사고','화재','붕괴','낙하','감전','가스누출','안전점검','소방','대피','안전관리','추락'],
+    'ESG':      ['ESG','사회공헌','기부','봉사','친환경경영','탄소중립','지역사회','상생','나눔','후원','캠페인'],
+  };
+  var TOPIC_LABEL = {'시공품질':'🔨 시공·품질','투자':'💰 투자·분양','거주':'🏠 거주환경','브랜드':'🏷️ 브랜드·PR','민원':'⚠️ 민원·이슈','안전':'🦺 안전','ESG':'🌱 ESG·사회공헌','기타':'기타'};
+  function classifyTopic(title, summary){
+    var t = (title||'') + ' ' + (summary||'');
+    var order = ['시공품질','투자','거주','브랜드','민원','안전','ESG'];
+    for(var i=0;i<order.length;i++){
+      var tp = order[i];
+      if(TOPIC_KW[tp].some(function(kw){ return t.indexOf(kw) !== -1; })) return tp;
+    }
+    return '기타';
+  }
+
+  // 상태
+  var activeBrands = new Set(BRANDS), currentKw = 'all', curSentFilter = 'all', curTopicFilter = 'all';
+  var areaChartInst = null, allItems = [];
+  var SOV = {all:{}}, SENT = {all:{}, pos:{}, neg:{}, neu:{}};
+  BRANDS.forEach(function(b){ SOV.all[b]=0; SENT.all[b]=0; SENT.pos[b]=0; SENT.neg[b]=0; SENT.neu[b]=0; });
+
+  // 주차 계산
+  function getMonday(d){ var day=d.getDay(), diff=d.getDate()-(day===0?6:day-1), m=new Date(d); m.setDate(diff); m.setHours(0,0,0,0); return m; }
+  function fmt(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  var startMon = getMonday(new Date(DATA_FROM)), thisMon = getMonday(new Date());
+  var WEEKLY_DATES = [];
+  for(var d0=new Date(startMon); d0<=thisMon; d0.setDate(d0.getDate()+7)) WEEKLY_DATES.push(fmt(new Date(d0)));
+  var TOTAL = WEEKLY_DATES.length;
+  var WEEKLY_LABELS = WEEKLY_DATES.map(function(_,i){ var diff=TOTAL-1-i; return diff===0?'W':('W-'+diff); });
+  var WEEKLY_SOV = {};
+  BRANDS.forEach(function(b){ WEEKLY_SOV[b] = Array(TOTAL).fill(0); });
+
+  function updateTime(){
+    var n = new Date();
+    var el = document.getElementById('sbUpdateTime');
+    if(el) el.textContent = String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+' 조회';
+  }
+
+  // 브랜드 필터
+  function renderBrandFilter(){
+    var el = document.getElementById('sbBrandFilter');
+    el.innerHTML = '<span class="sb-bf-label">브랜드</span>';
+    BRANDS.forEach(function(b){
+      var isXi = b === '자이';
+      var tag = document.createElement('button');
+      tag.className = 'sb-bf-tag active';
+      tag.dataset.brand = b;
+      if(isXi) tag.style.cssText = 'border-color:rgba(31,95,139,0.5);font-weight:700;color:var(--sb-xi)';
+      tag.innerHTML = '<span class="dot" style="background:'+BC[b]+'"></span>'+b+(isXi?' ✦':'');
+      tag.addEventListener('click', function(){
+        tag.classList.toggle('active');
+        if(activeBrands.has(b)) activeBrands.delete(b); else activeBrands.add(b);
+        applyAll();
+      });
+      el.appendChild(tag);
+    });
+  }
+
+  function applyAll(){
+    renderMainDonut(); renderKwSov(currentKw); renderSentAll(); renderAreaChart(); renderBuzzGrid(allItems);
+    document.querySelectorAll('#sbHotList .sb-hot-item').forEach(function(el){ el.classList.toggle('hidden', !activeBrands.has(el.dataset.brand)); });
+    applyFeedFilter();
+  }
+
+  // 도넛 헬퍼
+  function mkDonut(svgId, cx, cy, r, data){
+    var filtered = {};
+    Object.keys(data).forEach(function(b){ if(activeBrands.has(b)) filtered[b] = data[b]; });
+    var total = Object.values(filtered).reduce(function(a,b){return a+b;},0) || 1;
+    var C = 2*Math.PI*r, offset = 0;
+    var svg = document.getElementById(svgId); svg.innerHTML = '';
+    Object.entries(filtered).sort(function(a,b){return b[1]-a[1];}).forEach(function(pair){
+      var brand=pair[0], raw=pair[1], isXi = brand==='자이';
+      var dash=(raw/total)*C, gap=C-dash;
+      var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',r);
+      c.setAttribute('fill','none'); c.setAttribute('stroke', BC[brand]||'#888');
+      c.setAttribute('stroke-width', isXi ? (r>30?'16':'13') : (r>30?'12':'9'));
+      c.setAttribute('stroke-dasharray', dash+' '+gap);
+      c.setAttribute('stroke-dashoffset', String(-offset));
+      svg.appendChild(c); offset += dash;
+    });
+    return filtered;
+  }
+
+  function renderMainDonut(){
+    var filtered = mkDonut('sbMainDonutSvg','50','50',37,SOV.all);
+    var total = Object.values(filtered).reduce(function(a,b){return a+b;},0) || 0;
+    document.getElementById('sbDonutTotal').textContent = total.toLocaleString();
+    var pEl = document.getElementById('sbDonutPeriod');
+    if(pEl && allItems.length){
+      var dates = allItems.map(function(i){return i.작성일;}).filter(Boolean).sort();
+      var dFrom = dates[0] ? dates[0].slice(0,7) : '', dTo = dates[dates.length-1] ? dates[dates.length-1].slice(0,7) : '';
+      pEl.textContent = dFrom===dTo ? dFrom : (dFrom+' ~\n'+dTo);
+    }
+    var leg = document.getElementById('sbMainLegend'); leg.innerHTML = '';
+    Object.entries(filtered).sort(function(a,b){return b[1]-a[1];}).forEach(function(pair){
+      var brand=pair[0], raw=pair[1];
+      var pct = Math.round(raw/total*100) || 0, isXi = brand==='자이';
+      leg.innerHTML += '<div class="sb-legend-item">'+
+        '<div class="sb-legend-left"><div class="sb-legend-dot" style="background:'+BC[brand]+';'+(isXi?'width:10px;height:10px':'')+'"></div>'+
+        '<span class="sb-legend-name" style="'+(isXi?'color:var(--sb-xi);font-weight:700':'')+'">'+brand+(isXi?' ✦':'')+'</span></div>'+
+        '<span class="sb-legend-pct" style="'+(isXi?'color:var(--sb-xi)':'')+'">'+pct+'%</span></div>';
+    });
+  }
+
+  // 연관 키워드 SOV 그룹 (브랜드 경쟁력 5요인 기반)
+  var FKW = {
+    시공부정:['하자','결함','균열','누수','곰팡이','결로','층간소음','부실'],
+    투자긍정:['청약','시세차익','상승','당첨','재건축','재개발','프리미엄 붙','분양 완판'],
+    투자부정:['미분양','입주 지연','PF','공사 중단'],
+    거주긍정:['쾌적','조용','커뮤니티 좋','경관 좋','편의시설','학군','녹지'],
+    거주부정:['주차 부족','관리비 비싸','시끄럽','층간소음','좁아'],
+    스마트:  ['스마트홈','IoT','친환경','에너지','공기질','스마트 케어'],
+  };
+  var KW_GROUPS = {
+    브랜드파워:   ['추천','선호','1위','브랜드','고급','인기','평판','신뢰','럭셔리','프리미엄'],
+    시공품질:     FKW.시공부정.concat(['마감','단열','방음','시공','AS','하자보수']),
+    투자가치:     FKW.투자긍정.concat(FKW.투자부정, ['입주','분양가','청약경쟁률','로또청약']),
+    주거환경:     FKW.거주긍정.concat(FKW.거주부정, ['커뮤니티','조경','주차','관리비','학군','입지']),
+    스마트친환경: FKW.스마트.concat(['EV충전','태양광','홈네트워크','스마트케어','공기청정']),
+  };
+
+  function renderKwSov(key){
+    currentKw = key;
+    var data = SOV[key] || SOV.all;
+    var filtered = {};
+    Object.keys(data).forEach(function(b){ if(activeBrands.has(b)) filtered[b] = data[b]; });
+    var total = Object.values(filtered).reduce(function(a,b){return a+b;},0) || 1;
+    var c = document.getElementById('sbKwSovChart'); c.innerHTML = '';
+    Object.entries(filtered).sort(function(a,b){return b[1]-a[1];}).forEach(function(pair){
+      var brand=pair[0], raw=pair[1];
+      var pct = Math.round(raw/total*100), isXi = brand==='자이';
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:7px';
+      row.innerHTML = '<span style="font-size:11px;'+(isXi?'color:var(--sb-xi);font-weight:700':'color:var(--sb-muted)')+';min-width:72px">'+brand+(isXi?' ✦':'')+'</span>'+
+        '<div style="flex:1;height:'+(isXi?5:4)+'px;background:#e7ebec;border-radius:2px"><div style="height:100%;width:'+pct+'%;background:'+BC[brand]+';border-radius:2px"></div></div>'+
+        '<span style="font-size:11px;'+(isXi?'color:var(--sb-xi);font-weight:700':'color:var(--sb-muted)')+';min-width:30px;text-align:right">'+pct+'%</span>';
+      c.appendChild(row);
+    });
+  }
+
+  function selectKw(key){
+    document.querySelectorAll('.sb-kw-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.kw===key); });
+    if(key !== 'all'){
+      var grpKws = KW_GROUPS[key] || [key];
+      if(!SOV[key]){
+        var kd = {}; BRANDS.forEach(function(b){ kd[b]=0; });
+        allItems.forEach(function(i){
+          var txt = i.제목 + ' ' + i.내용요약;
+          if(grpKws.some(function(kw){return txt.indexOf(kw)!==-1;}) && kd[i.브랜드]!==undefined) kd[i.브랜드]++;
+        });
+        SOV[key] = kd;
+      }
+    }
+    renderKwSov(key);
+  }
+
+  function renderSentDonut(svgId, legId, sentKey){
+    var filtered = mkDonut(svgId,'40','40',27,SENT[sentKey]);
+    var total = Object.values(filtered).reduce(function(a,b){return a+b;},0) || 1;
+    var leg = document.getElementById(legId); leg.innerHTML = '';
+    Object.entries(filtered).sort(function(a,b){return b[1]-a[1];}).slice(0,5).forEach(function(pair){
+      var brand=pair[0], raw=pair[1];
+      var pct = Math.round(raw/total*100), isXi = brand==='자이';
+      leg.innerHTML += '<div class="sb-sent-legend-item">'+
+        '<div style="display:flex;align-items:center;gap:5px"><div style="width:6px;height:6px;border-radius:50%;background:'+BC[brand]+';flex-shrink:0"></div>'+
+        '<span style="color:var(--sb-muted);'+(isXi?'color:var(--sb-xi);font-weight:700':'')+'">'+brand+'</span></div>'+
+        '<span style="'+(isXi?'color:var(--sb-xi);font-weight:700':'color:var(--sb-ink)')+'">'+pct+'%</span></div>';
+    });
+  }
+  function renderSentAll(){ ['sbSd0','sbSd1','sbSd2','sbSd3'].forEach(function(id,i){ renderSentDonut(id, 'sbSl'+i, ['all','pos','neg','neu'][i]); }); }
+
+  function renderAreaChart(){
+    var sl = WEEKLY_LABELS, sd = WEEKLY_DATES;
+    var abl = BRANDS.filter(function(b){ return activeBrands.has(b); });
+    var rd = {}; abl.forEach(function(b){ rd[b] = WEEKLY_SOV[b]; });
+    var tots = sl.map(function(_,i){ return abl.reduce(function(s,b){ return s+(rd[b][i]||0); },0); });
+    var pd = {}; abl.forEach(function(b){ pd[b] = rd[b].map(function(v,i){ return tots[i] ? Math.round(v/tots[i]*100) : 0; }); });
+    var sb = abl.slice().sort(function(a,b){ return (pd[b][sl.length-1]||0)-(pd[a][sl.length-1]||0); });
+    var datasets = sb.map(function(b){
+      var isXi = b==='자이';
+      return {label:b, data:pd[b], backgroundColor:BC[b]+'22', borderColor:BC[b], borderWidth:isXi?3:1, fill:true, tension:0.35, pointRadius:isXi?4:2, pointBackgroundColor:BC[b]};
+    });
+    if(areaChartInst){ areaChartInst.destroy(); areaChartInst=null; }
+    var ctx = document.getElementById('sbAreaChart').getContext('2d');
+    areaChartInst = new Chart(ctx, {type:'line', data:{labels: sl.map(function(w,i){return w+'\n'+sd[i].slice(5);}), datasets:datasets}, options:{
+      responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+      scales:{
+        x:{stacked:true, grid:{color:'#e7ebec'}, ticks:{color:'#6d7c84', font:{size:10}, maxRotation:0}},
+        y:{stacked:true, min:0, max:100, grid:{color:'#e7ebec'}, ticks:{color:'#6d7c84', font:{size:10}, callback:function(v){return v+'%';}}}
+      },
+      plugins:{legend:{display:false}, tooltip:{backgroundColor:'#06364d', titleColor:'#fff', bodyColor:'#dce4e7', borderColor:'#0c4a64', borderWidth:1, callbacks:{label:function(ctx2){ return ctx2.dataset.label+': '+ctx2.parsed.y+'%'; }}}}
+    }});
+    var legEl = document.getElementById('sbAreaLegend'); legEl.innerHTML = '';
+    sb.forEach(function(b){
+      var isXi = b==='자이';
+      legEl.innerHTML += '<div class="sb-area-leg-item"><div class="sb-area-leg-dot" style="background:'+BC[b]+';'+(isXi?'width:9px;height:9px':'')+'"></div><span style="'+(isXi?'color:var(--sb-xi);font-weight:700':'')+'">'+b+(isXi?' ✦':'')+'</span></div>';
+    });
+  }
+
+  // 브랜드 헬스 스코어
+  function calcHealthScores(items){
+    var scores = {};
+    BRANDS.forEach(function(b){
+      var bi = items.filter(function(i){return i.브랜드===b;}), total = bi.length || 1;
+      var pos = bi.filter(function(i){return i.감성==='긍정';}).length;
+      var totalAll = items.length || 1;
+      var posRatio = Math.round((pos/total)*100);
+      var sovRatio = Math.round((total/totalAll)*100);
+      var brandPower = Math.min(100, Math.round(posRatio*0.6 + sovRatio*0.4*3));
+      var constNeg = bi.filter(function(i){ return FKW.시공부정.some(function(kw){return (i.제목+i.내용요약).indexOf(kw)!==-1;}); }).length;
+      var constScore = Math.max(0, Math.round(100-(constNeg/total)*300));
+      var invPos = bi.filter(function(i){ return FKW.투자긍정.some(function(kw){return (i.제목+i.내용요약).indexOf(kw)!==-1;}); }).length;
+      var invNeg = bi.filter(function(i){ return FKW.투자부정.some(function(kw){return (i.제목+i.내용요약).indexOf(kw)!==-1;}); }).length;
+      var invScore = Math.min(100, Math.max(0, Math.round(50+(invPos-invNeg)/total*200)));
+      var livPos = bi.filter(function(i){ return FKW.거주긍정.some(function(kw){return (i.제목+i.내용요약).indexOf(kw)!==-1;}); }).length;
+      var livNeg = bi.filter(function(i){ return FKW.거주부정.some(function(kw){return (i.제목+i.내용요약).indexOf(kw)!==-1;}); }).length;
+      var livScore = Math.min(100, Math.max(0, Math.round(50+(livPos-livNeg)/total*200)));
+      var smartCnt = bi.filter(function(i){ return FKW.스마트.some(function(kw){return (i.제목+i.내용요약).indexOf(kw)!==-1;}); }).length;
+      var smartScore = Math.min(100, Math.round(30+(smartCnt/total)*700));
+      scores[b] = {total: Math.round((brandPower+constScore+invScore+livScore+smartScore)/5), factors:[
+        {name:'브랜드 파워', val:brandPower, icon:'🏆', detail:'긍정버즈 '+pos+'건('+posRatio+'%)×0.6 + 버즈점유율 '+sovRatio+'%×0.4×3 = '+brandPower+'점'},
+        {name:'시공·품질', val:constScore, icon:'🔨', detail:'시공부정 키워드 '+constNeg+'건 → 100 − ('+constNeg+'/'+total+')×300 = '+constScore+'점'},
+        {name:'투자 가치', val:invScore, icon:'💰', detail:'투자긍정 '+invPos+'건 − 투자부정 '+invNeg+'건 = '+(invPos-invNeg>0?'+':'')+(invPos-invNeg)+' → 50+('+(invPos-invNeg)+'/'+total+')×200 = '+invScore+'점'},
+        {name:'주거 환경', val:livScore, icon:'🌿', detail:'거주긍정 '+livPos+'건 − 거주부정 '+livNeg+'건 = '+(livPos-livNeg>0?'+':'')+(livPos-livNeg)+' → 50+('+(livPos-livNeg)+'/'+total+')×200 = '+livScore+'점'},
+        {name:'스마트·친환경', val:smartScore, icon:'🤖', detail:'스마트 키워드 '+smartCnt+'건 → 30+('+smartCnt+'/'+total+')×700 = '+smartScore+'점'},
+      ]};
+    });
+    return scores;
+  }
+
+  function renderHealthGrid(scores){
+    var grid = document.getElementById('sbHealthGrid'); grid.innerHTML = '';
+    BRANDS.filter(function(b){return activeBrands.has(b);}).sort(function(a,b){return scores[b].total-scores[a].total;}).forEach(function(b){
+      var s = scores[b], isXi = b==='자이';
+      var card = document.createElement('div');
+      card.className = 'sb-health-card' + (isXi?' sb-xi-card':'');
+      card.innerHTML =
+        '<div class="sb-health-brand"><span style="display:inline-block;width:'+(isXi?9:7)+'px;height:'+(isXi?9:7)+'px;border-radius:50%;background:'+BC[b]+';flex-shrink:0"></span>'+
+        '<span style="'+(isXi?'color:var(--sb-xi);font-weight:700':'')+'">'+b+(isXi?' ✦':'')+'</span></div>'+
+        '<div class="sb-health-score-total" style="color:'+(isXi?'var(--sb-xi)':BC[b])+'">'+s.total+'</div>'+
+        '<div class="sb-health-score-label">/ 100점</div>'+
+        '<div class="sb-factor-list">'+s.factors.map(function(f){
+          return '<div class="sb-factor-item"><div class="sb-factor-top"><span class="sb-factor-name">'+f.icon+' '+f.name+'</span><span class="sb-factor-val">'+f.val+'</span></div>'+
+          '<div class="sb-factor-bar"><div class="sb-factor-fill" style="width:'+f.val+'%;background:'+BC[b]+'"></div></div>'+
+          '<div class="sb-factor-detail-tip">'+f.detail+'</div></div>';
+        }).join('')+'</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  // 브랜드별 버즈량
+  function renderBuzzGrid(items){
+    var grid = document.getElementById('sbBuzzGrid'); grid.innerHTML = '';
+    BRANDS.filter(function(b){return activeBrands.has(b);}).forEach(function(b){
+      var bi = items.filter(function(i){return i.브랜드===b;});
+      var pos = bi.filter(function(i){return i.감성==='긍정';}).length;
+      var neg = bi.filter(function(i){return i.감성==='부정';}).length;
+      var neu = bi.length - pos - neg;
+      var total = bi.length || 1;
+      var isXi = b==='자이';
+      var card = document.createElement('div');
+      card.className = 'sb-buzz-card' + (isXi?' sb-xi-card':'');
+      card.innerHTML =
+        '<div class="sb-buzz-brand"><span style="display:inline-block;width:'+(isXi?9:7)+'px;height:'+(isXi?9:7)+'px;border-radius:50%;background:'+BC[b]+';flex-shrink:0"></span>'+
+        '<span style="'+(isXi?'color:var(--sb-xi);font-weight:700':'')+'">'+b+(isXi?' ✦':'')+'</span></div>'+
+        '<div class="sb-buzz-count" style="color:'+(isXi?'var(--sb-xi)':'var(--sb-ink)')+'">'+bi.length.toLocaleString()+'</div>'+
+        '<div class="sb-buzz-sent-row">'+
+          '<span class="sb-buzz-sent-item">🟢 <span>'+pos+'</span></span>'+
+          '<span class="sb-buzz-sent-item">🔴 <span>'+neg+'</span></span>'+
+          '<span class="sb-buzz-sent-item">🟡 <span>'+neu+'</span></span>'+
+        '</div>'+
+        '<div class="sb-buzz-bar-stack">'+
+          '<div class="sb-bstack-pos" style="width:'+Math.round(pos/total*100)+'%"></div>'+
+          '<div class="sb-bstack-neg" style="width:'+Math.round(neg/total*100)+'%"></div>'+
+          '<div class="sb-bstack-neu" style="width:'+Math.round(neu/total*100)+'%"></div>'+
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  function filterSent(type){ curSentFilter = type; document.querySelectorAll('.sb-filter-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.sent===type); }); applyFeedFilter(); }
+  function filterTopic(type){ curTopicFilter = type; document.querySelectorAll('.sb-topic-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.topic===type); }); applyFeedFilter(); }
+  function applyFeedFilter(){
+    document.querySelectorAll('#sbFeedGrid .sb-feed-card').forEach(function(card){
+      var bOk = activeBrands.has(card.dataset.brand);
+      var sOk = true, tOk = true;
+      if(curSentFilter==='xi') sOk = card.dataset.brand==='자이';
+      else if(curSentFilter==='premium') sOk = card.dataset.premium==='Y';
+      else if(curSentFilter!=='all') sOk = card.dataset.sent===curSentFilter;
+      if(curTopicFilter!=='all') tOk = card.dataset.topic===curTopicFilter;
+      card.classList.toggle('hidden', !bOk||!sOk||!tOk);
+    });
+  }
+
+  function timeAgo(s){
+    if(!s) return '';
+    var d = new Date(s); if(isNaN(d)) return s;
+    var diff = Math.floor((Date.now()-d)/1000/60);
+    if(diff<60) return diff+'분 전';
+    if(diff<1440) return Math.floor(diff/60)+'시간 전';
+    if(diff<10080) return Math.floor(diff/1440)+'일 전';
+    return s.slice(0,10);
+  }
+
+  async function loadFromSheets(){
+    try{
+      var res = await fetch(SHEETS_BASE + '&range=A1:J100000');
+      var text = await res.text();
+      var json = JSON.parse(text.replace(/^.*?({.*}).*$/s, '$1'));
+      var allRows = (json.table && json.table.rows) || [];
+      if(!allRows.length){
+        document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:13px">수집된 데이터가 없어요. collector.py를 실행해주세요.</div>';
+        return;
+      }
+      var items = allRows.map(function(r){
+        var c = r.c;
+        return {
+          수집일시: (c[0]&&c[0].v)||'', 작성일:(c[1]&&c[1].v)||'', 채널:(c[2]&&c[2].v)||'', 브랜드:(c[3]&&c[3].v)||'',
+          제목:(c[4]&&c[4].v)||'', 내용요약:(c[5]&&c[5].v)||'', 감성:(c[6]&&c[6].v)||'중립',
+          원문URL:(c[7]&&c[7].v)||'', 댓글수:(c[8]&&c[8].v)||'', 프리미엄:(c[9]&&c[9].v)||'',
+        };
+      }).filter(function(i){ return i.제목 && (!i.작성일 || i.작성일>=DATA_FROM) && BRANDS.indexOf(i.브랜드)!==-1; });
+      allItems = items;
+
+      BRANDS.forEach(function(b){ SOV.all[b]=0; });
+      items.forEach(function(i){ if(SOV.all[i.브랜드]!==undefined) SOV.all[i.브랜드]++; });
+      BRANDS.forEach(function(b){ SENT.all[b]=0; SENT.pos[b]=0; SENT.neg[b]=0; SENT.neu[b]=0; });
+      items.forEach(function(i){
+        var b=i.브랜드; if(SENT.all[b]===undefined) return;
+        SENT.all[b]++;
+        if(i.감성==='긍정') SENT.pos[b]++; else if(i.감성==='부정') SENT.neg[b]++; else SENT.neu[b]++;
+      });
+
+      var wkC = WEEKLY_DATES.map(function(){ var o={}; BRANDS.forEach(function(b){o[b]=0;}); return o; });
+      items.forEach(function(i){
+        if(!i.작성일) return;
+        var d = i.작성일.slice(0,10);
+        for(var idx=0; idx<WEEKLY_DATES.length; idx++){
+          var ws = WEEKLY_DATES[idx], we = idx<WEEKLY_DATES.length-1 ? WEEKLY_DATES[idx+1] : '9999-12-31';
+          if(d>=ws && d<we){ if(wkC[idx][i.브랜드]!==undefined) wkC[idx][i.브랜드]++; break; }
+        }
+      });
+      BRANDS.forEach(function(b){
+        WEEKLY_SOV[b] = wkC.map(function(wk){
+          var tot = BRANDS.reduce(function(s,br){ return s+(wk[br]||0); },0);
+          return tot ? Math.round((wk[b]||0)/tot*100) : 0;
+        });
+      });
+
+      renderMainDonut(); renderKwSov('all'); renderSentAll(); renderAreaChart(); renderBuzzGrid(items);
+      renderHealthGrid(calcHealthScores(items));
+
+      Object.entries(KW_GROUPS).forEach(function(pair){
+        var grpKey=pair[0], kws=pair[1];
+        var kd = {}; BRANDS.forEach(function(b){ kd[b]=0; });
+        items.forEach(function(i){
+          var txt = i.제목+' '+i.내용요약;
+          if(kws.some(function(kw){return txt.indexOf(kw)!==-1;}) && kd[i.브랜드]!==undefined) kd[i.브랜드]++;
+        });
+        SOV[grpKey] = kd;
+      });
+
+      // 브랜드별 핵심 키워드 (주거 도메인 사전 기반 Top10)
+      var HOUSING_DICT = {
+        '시공·품질': ['하자','균열','누수','결로','곰팡이','층간소음','단열','마감','내구성','부실','방음','결함','침수'],
+        '투자·시세': ['시세차익','프리미엄','상승','재건축','재개발','청약','당첨','분양권','갭투자','호가','시세상승','투자가치'],
+        '주거환경':  ['커뮤니티','조경','학군','교통','편의시설','쾌적','녹지','주차','관리비','경관','단지환경','어린이집','헬스장'],
+        '스마트·친환경':['스마트홈','IoT','친환경','에너지','공기질','EV충전','태양광','스마트케어','홈네트워크','스마트'],
+        '긍정 반응': ['좋아요','추천','만족','훌륭','최고','강추','기대','살기좋','완판','선호','인기','호평'],
+        '부정 반응': ['불만','실망','최악','항의','소송','피해','부실시공','하자보수','민원','갑질','불편'],
+      };
+      var ALL_DICT_KWS = Object.values(HOUSING_DICT).flat();
+      var bkm = {}; BRANDS.forEach(function(b){ bkm[b]={}; });
+      items.forEach(function(i){
+        var b=i.브랜드; if(!bkm[b]) return;
+        var text = i.제목+' '+i.내용요약;
+        ALL_DICT_KWS.forEach(function(kw){ if(text.indexOf(kw)!==-1) bkm[b][kw]=(bkm[b][kw]||0)+1; });
+      });
+      var kwListEl = document.getElementById('sbBrandKwList'); kwListEl.innerHTML = '';
+      BRANDS.forEach(function(b){
+        var isXi = b==='자이';
+        var topKws = Object.entries(bkm[b]).sort(function(a,c){return c[1]-a[1];}).slice(0,10).map(function(p){return p[0];});
+        if(!topKws.length) return;
+        var chips = topKws.map(function(w){ return '<span class="sb-brand-chip'+(isXi?' xi':'')+'">'+w+'</span>'; }).join('');
+        kwListEl.innerHTML += '<div class="sb-brand-kw-item"><span class="sb-brand-kw-name" style="'+(isXi?'color:var(--sb-xi)':'')+'">'+b+(isXi?' ✦':'')+'</span><div class="sb-brand-kw-chips">'+chips+'</div></div>';
+      });
+
+      // Hot 이슈 — 브랜드별 최신 1건
+      var lb = {};
+      items.forEach(function(i){ var b=i.브랜드; if(!i.작성일) return; if(!lb[b] || i.작성일>lb[b].작성일) lb[b]=i; });
+      var hotList = document.getElementById('sbHotList'); hotList.innerHTML = '';
+      BRANDS.filter(function(b){return lb[b];}).sort(function(a,b){return lb[b].작성일.localeCompare(lb[a].작성일);}).forEach(function(b){
+        var i = lb[b], isXi = b==='자이';
+        var sc = i.감성==='긍정'?'sb-s-pos':i.감성==='부정'?'sb-s-neg':'sb-s-neu';
+        var se = i.감성==='긍정'?'🟢 긍정':i.감성==='부정'?'🔴 부정':'🟡 중립';
+        var topic = classifyTopic(i.제목, i.내용요약);
+        var urlHtml = i.원문URL ? '<a href="'+i.원문URL+'" target="_blank" style="font-size:11px;color:var(--sb-xi);text-decoration:none;font-weight:700">원문 ↗</a>' : '';
+        var premHtml = i.프리미엄==='Y' ? '<span style="font-size:10px;color:var(--sb-neu);border:1px solid #e7d9b8;padding:1px 6px;border-radius:6px">💎</span>' : '';
+        var el = document.createElement('div');
+        el.className = 'sb-hot-item' + (isXi?' sb-xi-card':'');
+        el.dataset.brand = b;
+        el.innerHTML =
+          '<span class="sb-hot-brand-tag" style="color:'+(isXi?'var(--sb-xi)':BC[b])+'">'+b+(isXi?' ✦':'')+'</span>'+
+          '<div class="sb-hot-title">'+i.제목.slice(0,80)+(i.제목.length>80?'...':'')+'</div>'+
+          '<div class="sb-hot-meta">'+premHtml+'<span class="sb-topic-badge">'+(TOPIC_LABEL[topic]||topic)+'</span><span class="sb-sent-badge '+sc+'">'+se+'</span><span class="sb-hot-ch">'+i.채널+'·'+i.작성일.slice(0,10)+'</span>'+urlHtml+'</div>';
+        hotList.appendChild(el);
+      });
+
+      // 전체 이슈 피드 (브랜드당 균등 할당, 최신 30건)
+      var PER = Math.ceil(30/BRANDS.length);
+      var bp = {}; BRANDS.forEach(function(b){ bp[b] = items.filter(function(i){return i.브랜드===b;}).sort(function(a,c){return c.작성일.localeCompare(a.작성일);}).slice(0,PER); });
+      var fi = Object.values(bp).flat().sort(function(a,b){return b.작성일.localeCompare(a.작성일);}).slice(0,30);
+      var grid = document.getElementById('sbFeedGrid'); grid.innerHTML = '';
+      fi.forEach(function(i){
+        var isXi = i.브랜드==='자이';
+        var sc = i.감성==='긍정'?'sb-s-pos':i.감성==='부정'?'sb-s-neg':'sb-s-neu';
+        var se = i.감성==='긍정'?'🟢 긍정':i.감성==='부정'?'🔴 부정':'🟡 중립';
+        var st = i.감성==='긍정'?'pos':i.감성==='부정'?'neg':'neu';
+        var topic = classifyTopic(i.제목, i.내용요약);
+        var urlHtml = i.원문URL ? '<a href="'+i.원문URL+'" target="_blank" class="sb-feed-link">원문 ↗</a>' : '';
+        var card = document.createElement('div');
+        card.className = 'sb-feed-card' + (isXi?' sb-xi-card':'');
+        card.dataset.brand = i.브랜드; card.dataset.sent = st; card.dataset.topic = topic; card.dataset.premium = i.프리미엄 || '';
+        card.innerHTML =
+          '<div class="sb-feed-top"><span class="sb-feed-brand" style="color:'+(isXi?'var(--sb-xi)':BC[i.브랜드])+'">'+i.브랜드+(isXi?' ✦':'')+'</span><span class="sb-feed-time">'+timeAgo(i.작성일)+'</span></div>'+
+          '<div style="display:flex;gap:5px;flex-wrap:wrap"><span class="sb-sent-badge '+sc+'">'+se+'</span><span class="sb-topic-badge">'+(TOPIC_LABEL[topic]||topic)+'</span>'+
+          (i.프리미엄==='Y' ? '<span class="sb-topic-badge" style="border-color:#e7d9b8;color:var(--sb-neu)">💎 하이엔드</span>' : '')+'</div>'+
+          '<div class="sb-feed-title">'+i.제목.slice(0,60)+(i.제목.length>60?'...':'')+'</div>'+
+          (i.내용요약 ? '<div class="sb-feed-summary">'+i.내용요약.slice(0,70)+'...</div>' : '')+
+          '<div class="sb-feed-bottom"><span class="sb-feed-ch">'+i.채널+'</span>'+urlHtml+'</div>';
+        grid.appendChild(card);
+      });
+
+      applyFeedFilter();
+      updateTime();
+      console.log('✅ Social Buzz: '+items.length+'개 로드 완료');
+    }catch(e){
+      console.error('Sheets 로드 오류:', e);
+      document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:13px">⚠️ 데이터 로드 실패. 스프레드시트 공개 설정을 확인해주세요.</div>';
+    }
+  }
+
+  // 이벤트 바인딩
+  document.querySelectorAll('.sb-kw-btn').forEach(function(b){ b.addEventListener('click', function(){ selectKw(b.dataset.kw); }); });
+  document.querySelectorAll('.sb-topic-btn').forEach(function(b){ b.addEventListener('click', function(){ filterTopic(b.dataset.topic); }); });
+  document.querySelectorAll('.sb-filter-btn').forEach(function(b){ b.addEventListener('click', function(){ filterSent(b.dataset.sent); }); });
+
+  renderBrandFilter();
+  renderMainDonut(); renderKwSov('all'); renderSentAll(); renderAreaChart();
+  loadFromSheets();
+})();
 </script>
