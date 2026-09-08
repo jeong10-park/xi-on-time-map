@@ -217,6 +217,7 @@
      SOCIAL BUZZ — Press Board(xi-signal.vercel.app) 톤앤매너 적용
   ================================================================== */
   #page-social-buzz{
+    position:relative;
     --sb-navy:#06364d; --sb-navy2:#0c4a64; --sb-ink:#17272f; --sb-muted:#6d7c84;
     --sb-line:#dce4e7; --sb-surface:#f4f6f7; --sb-white:#ffffff;
     --sb-xi:#1f5f8b; --sb-raemian:#009dad; --sb-hillstate:#a5103d;
@@ -226,6 +227,21 @@
     --sb-neg:#c14545; --sb-neg-bg:#fbecec;
     --sb-neu:#b17f22; --sb-neu-bg:#faf3e3;
   }
+  /* ── 데이터 로딩 오버레이 ─────────────────────────────── */
+  .sb-loading-overlay{
+    position:absolute; inset:0; z-index:80; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px;
+    background:color-mix(in srgb, var(--sb-surface) 92%, transparent);
+    transition:opacity .35s ease; opacity:1;
+  }
+  .sb-loading-overlay.sb-hidden{ opacity:0; pointer-events:none; }
+  .sb-spinner{
+    width:38px; height:38px; border-radius:50%;
+    border:4px solid var(--sb-line); border-top-color:var(--sb-xi);
+    animation:sb-spin .8s linear infinite;
+  }
+  @keyframes sb-spin{ to{ transform:rotate(360deg); } }
+  .sb-loading-text{ font-size:13px; font-weight:600; color:var(--sb-muted); }
   #page-social-buzz .page-scroll{
     background:var(--sb-surface); padding:24px 32px 56px;
     font-family:"Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI","Malgun Gothic",sans-serif;
@@ -466,6 +482,10 @@
   <main>
     <!-- ===================== SOCIAL BUZZ ===================== -->
     <section class="page" id="page-social-buzz">
+      <div class="sb-loading-overlay" id="sbLoadingOverlay">
+        <div class="sb-spinner"></div>
+        <div class="sb-loading-text">📡 데이터 불러오는 중...</div>
+      </div>
       <div class="topbar">
         <div>
           <div class="page-title">Social Buzz</div>
@@ -1181,6 +1201,9 @@
     }catch(e){
       console.error('Supabase 로드 오류:', e);
       document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">⚠️ 데이터 로드 실패. Supabase 연결/권한 설정을 확인해주세요.</div>';
+    }finally{
+      var ov = document.getElementById('sbLoadingOverlay');
+      if(ov) ov.classList.add('sb-hidden');
     }
   }
 
