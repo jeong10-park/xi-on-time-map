@@ -713,8 +713,10 @@
   };
   var BRANDS = ['자이','힐스테이트','롯데캐슬','래미안','아이파크','위브','푸르지오','이편한세상','더샵','SK뷰'];
 
-  var SHEETS_ID   = '1CSjDf8z-XFSP3Fbk87hpCSY1WrQ3r55ff6cMP4RTfvM';
-  var SHEETS_BASE = 'https://docs.google.com/spreadsheets/d/' + SHEETS_ID + '/gviz/tq?tqx=out:json&sheet=피드';
+  // 2026-09-08: Google Sheets → Supabase 전환. Publishable key는 브라우저에 노출돼도
+  // 안전한 키(anon, RLS로 읽기 전용만 허용됨)라서 그대로 코드에 둡니다.
+  var SUPABASE_URL      = 'https://uzvhchqdzhudleejbbwc.supabase.co';
+  var SUPABASE_ANON_KEY = 'sb_publishable_f6Q3yQ_SzaHqDnnPhSgm8w_O-TflDu6';
   var DATA_FROM   = '2025-01-01';
 
   // 토픽 필터 — 기존 5개(시공품질/투자/거주/브랜드/민원) 그대로 + 안전 · ESG·사회공헌 신규 추가
@@ -1029,26 +1031,41 @@
     return s.slice(0,10);
   }
 
-  async function loadFromSheets(){
+  // Supabase REST API는 한 번 요청에 기본 최대 1000행까지만 돌려주기 때문에,
+  // limit/offset으로 페이지를 넘겨가며 buzz_feed 테이블 전체를 다 받아올 때까지 반복합니다.
+  async function fetchAllBuzzRows(){
+    var pageSize = 1000, offset = 0, all = [];
+    while(true){
+      var url = SUPABASE_URL + '/rest/v1/buzz_feed?select=*&order=collected_at.desc&offset=' + offset + '&limit=' + pageSize;
+      var res = await fetch(url, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+      });
+      if(!res.ok) throw new Error('Supabase 응답 오류: ' + res.status);
+      var chunk = await res.json();
+      all = all.concat(chunk);
+      if(chunk.length < pageSize) break;
+      offset += pageSize;
+    }
+    return all;
+  }
+
+  async function loadFromSupabase(){
     try{
-      var res = await fetch(SHEETS_BASE + '&range=A1:J100000');
-      var text = await res.text();
-      var json = JSON.parse(text.replace(/^.*?({.*}).*$/s, '$1'));
-      var allRows = (json.table && json.table.rows) || [];
-      if(!allRows.length){
+      var rows = await fetchAllBuzzRows();
+      if(!rows.length){
         document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">수집된 데이터가 없어요. collector.py를 실행해주세요.</div>';
         return;
       }
-      var items = allRows.map(function(r){
-        var c = r.c;
+      var items = rows.map(function(r){
         return {
-          수집일시: (c[0]&&c[0].v)||'', 작성일:(c[1]&&c[1].v)||'', 채널:(c[2]&&c[2].v)||'', 브랜드:(c[3]&&c[3].v)||'',
-          제목:(c[4]&&c[4].v)||'', 내용요약:(c[5]&&c[5].v)||'', 감성:(c[6]&&c[6].v)||'중립',
-          원문URL:(c[7]&&c[7].v)||'', 댓글수:(c[8]&&c[8].v)||'', 프리미엄:(c[9]&&c[9].v)||'',
+          수집일시: r.collected_at||'', 작성일:r.published_at||'', 채널:r.channel||'', 브랜드:r.brand||'',
+          제목:r.title||'', 내용요약:r.summary||'', 감성:r.sentiment||'중립',
+          원문URL:r.source_url||'', 댓글수:r.comment_count||'', 프리미엄:r.is_premium||'',
+          topic: r.topic||[], _genuine: r.is_genuine !== false,
         };
       }).filter(function(i){
         var isNews = i.채널 && i.채널.indexOf('뉴스') !== -1; // 뉴스는 수집은 되지만 이 페이지엔 표시 안 함
-        return i.제목 && !isNews && (!i.작성일 || i.작성일>=DATA_FROM) && BRANDS.indexOf(i.브랜드)!==-1;
+        return i._genuine && i.제목 && !isNews && (!i.작성일 || i.작성일>=DATA_FROM) && BRANDS.indexOf(i.브랜드)!==-1;
       });
       allItems = items;
 
@@ -1167,8 +1184,8 @@
       updateTime();
       console.log('✅ Social Buzz: '+items.length+'개 로드 완료');
     }catch(e){
-      console.error('Sheets 로드 오류:', e);
-      document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">⚠️ 데이터 로드 실패. 스프레드시트 공개 설정을 확인해주세요.</div>';
+      console.error('Supabase 로드 오류:', e);
+      document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">⚠️ 데이터 로드 실패. Supabase 연결/권한 설정을 확인해주세요.</div>';
     }
   }
 
@@ -1179,6 +1196,6 @@
 
   renderBrandFilter();
   renderMainDonut(); renderKwSov('all'); renderSentAll(); renderAreaChart();
-  loadFromSheets();
+  loadFromSupabase();
 })();
 </script>
