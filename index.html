@@ -469,11 +469,10 @@
       <div class="topbar">
         <div>
           <div class="page-title">Social Buzz</div>
-          <div class="page-desc">페이지·카페·블로그 3개 채널 버즈량·감성·이슈를 자체 수집 데이터로 분석합니다.</div>
-          <div class="sb-note">네이버, 카카오의 카페, 블로그, 웹페이지 검색 결과 반영</div>
+          <div class="page-desc">네이버, 카카오의 웹페이지, 카페, 블로그 3개 채널의 버즈량을 수집하여 분석합니다.</div>
         </div>
         <div class="topbar-actions">
-          <span class="sb-source-pill"><span class="dot"></span>Sheets 연동</span>
+          <span class="sb-source-pill"><span class="dot"></span>Supabase 연동</span>
           <span id="sbUpdateTime" class="pending-pill" style="color:var(--text-secondary); background:var(--content-bg);"></span>
         </div>
       </div>
@@ -585,12 +584,7 @@
             <button class="sb-filter-btn" data-sent="xi">✦ 자이만</button>
             <button class="sb-filter-btn" data-sent="premium">💎 하이엔드</button>
           </div>
-          <div class="sb-feed-grid" id="sbFeedGrid"><div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">📡 Google Sheets에서 데이터를 불러오는 중...</div></div>
-        </div>
-
-        <div class="sb-footer-note">
-          <span>이 화면 표시 채널: 페이지·카페·블로그 (뉴스는 별도 수집되나 이 화면엔 표시 안 함)</span>
-          <span>Press Board(언론 분석)와는 별도로 독립 집계됩니다</span>
+          <div class="sb-feed-grid" id="sbFeedGrid"><div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">📡 Supabase에서 데이터를 불러오는 중...</div></div>
         </div>
       </div>
     </section>
@@ -907,7 +901,8 @@
     var sb = abl.slice().sort(function(a,b){ return (pd[b][sl.length-1]||0)-(pd[a][sl.length-1]||0); });
     var datasets = sb.map(function(b){
       var isXi = b==='자이';
-      return {label:b, data:pd[b], backgroundColor:BC[b]+'22', borderColor:BC[b], borderWidth:isXi?3:1, fill:true, tension:0.35, pointRadius:isXi?4:2, pointBackgroundColor:BC[b]};
+      // 자이 영역만 채우기 색을 진하게 줘서 스택 차트에서도 확실히 파란색으로 보이게 함
+      return {label:b, data:pd[b], backgroundColor:BC[b]+(isXi?'99':'18'), borderColor:BC[b], borderWidth:isXi?3:1, fill:true, tension:0.35, pointRadius:isXi?4:2, pointBackgroundColor:BC[b], order:isXi?0:1};
     });
     if(areaChartInst){ areaChartInst.destroy(); areaChartInst=null; }
     var ctx = document.getElementById('sbAreaChart').getContext('2d');
