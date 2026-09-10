@@ -292,7 +292,7 @@
   .sb-sov-grid{display:grid; grid-template-columns:380px 1fr; gap:14px;}
   .sb-donut-wrap{position:relative; width:clamp(180px,20vw,260px); height:clamp(180px,20vw,260px); margin:0 auto 18px;}
   .sb-donut-wrap svg{width:100%; height:100%; transform:rotate(-90deg);}
-  .sb-donut-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .sb-donut-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;} /* 텍스트 표시용 — 아래 도넛 링 호버를 막지 않도록 */
   .sb-donut-total{font-size:clamp(24px,2.4vw,32px); font-weight:800; font-family:ui-monospace,"JetBrains Mono",monospace; color:var(--sb-navy);}
   .sb-donut-unit{font-size:13px; color:var(--sb-muted); margin-top:2px;}
   .sb-legend{display:flex; flex-direction:column; gap:6px;}
@@ -314,26 +314,42 @@
   }
   .sb-ch-btn.active{border-color:var(--sb-xi); color:var(--sb-xi); background:#eaf1f5; font-weight:700;}
 
-  .sb-kw-bar-wrap{display:flex; gap:5px; flex-wrap:wrap; margin-bottom:12px;}
-  .sb-kw-btn{
-    font-size:13px; padding:4px 11px; border-radius:16px; border:1px solid var(--sb-line);
-    color:var(--sb-muted); cursor:pointer; background:var(--sb-white); font-family:inherit; transition:all .15s;
-  }
-  .sb-kw-btn.active{border-color:var(--sb-xi); color:var(--sb-xi); background:#eaf1f5; font-weight:700;}
-  .sb-brand-kw-list{display:flex; flex-direction:column; gap:8px;}
-  .sb-brand-kw-item{display:flex; align-items:flex-start; gap:10px;}
-  .sb-brand-kw-name{font-size:13px; color:var(--sb-ink); min-width:72px; padding-top:2px; flex-shrink:0; font-weight:600;}
-  .sb-brand-kw-chips{display:flex; gap:4px; flex-wrap:wrap;}
-  .sb-brand-chip{font-size:12px; padding:2px 8px; border-radius:8px; border:1px solid var(--sb-line); color:var(--sb-muted); background:#fafbfb;}
-  .sb-brand-chip.xi{border-color:rgba(31,95,139,0.4); color:var(--sb-xi); background:#eaf1f5;}
   .sb-divider{border-top:1px solid var(--sb-line);}
+
+  /* 연관 키워드 SOV — 토픽별 미니 도넛 그리드 (버튼 전환 대신 7개를 한 번에 보여줌) */
+  .sb-kw-donut-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:16px 10px;}
+  .sb-kw-donut-card{display:flex; flex-direction:column; align-items:center; text-align:center;}
+  .sb-kw-donut-title{font-size:12px; font-weight:700; color:var(--sb-ink); margin-bottom:8px; line-height:1.3;}
+  .sb-kw-donut-wrap{position:relative; width:clamp(72px,9vw,104px); height:clamp(72px,9vw,104px); margin:0 auto 10px;}
+  .sb-kw-donut-wrap svg{width:100%; height:100%; transform:rotate(-90deg);}
+  .sb-kw-donut-legend{display:flex; flex-direction:column; gap:3px; width:100%;}
+  .sb-kw-legend-item{display:flex; align-items:center; justify-content:center; gap:5px; font-size:11.5px; color:var(--sb-muted);}
+  .sb-kw-legend-item .dot{width:6px; height:6px; border-radius:50%; flex-shrink:0;}
+
+  /* 브랜드 경쟁력 스코어 — 다각형 그래프 전용 브랜드 필터(아래 스코어판에는 영향 없음) */
+  .sb-radar-brand-bar{display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin-bottom:8px;}
+  .sb-radar-brand-btn{
+    font-size:12.5px; padding:4px 11px; border-radius:16px; border:1px solid var(--sb-line);
+    color:var(--sb-muted); cursor:pointer; background:var(--sb-white); font-family:inherit; transition:all .15s;
+    display:flex; align-items:center; gap:6px;
+  }
+  .sb-radar-brand-btn .dot{width:7px; height:7px; border-radius:50%; flex-shrink:0;}
+  .sb-radar-brand-btn.active{background:#eef3f5; border-color:var(--sb-navy2); color:var(--sb-ink); font-weight:700;}
+  .sb-radar-brand-btn.inactive{opacity:.4;}
+
+  /* 도넛 호버 시 뜨는 플로팅 수치 툴팁 (전체/감성/연관키워드 도넛 공용) */
+  .sb-donut-tooltip{
+    position:fixed; pointer-events:none; z-index:999; opacity:0; transition:opacity .1s;
+    background:#06364d; color:#fff; padding:6px 10px; border-radius:6px; font-size:12.5px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.2); white-space:nowrap;
+  }
 
   .sb-sent-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
   .sb-sent-card{background:var(--sb-white); border:1px solid var(--sb-line); border-radius:var(--sb-radius-sm); padding:20px; box-shadow:var(--sb-shadow);}
   .sb-sent-card-title{font-size:15px; font-weight:700; color:var(--sb-ink); margin-bottom:16px;}
   .sb-sent-donut-wrap{position:relative; width:clamp(110px,16vw,190px); height:clamp(110px,16vw,190px); margin:0 auto 14px;}
   .sb-sent-donut-wrap svg{width:100%; height:100%; transform:rotate(-90deg);}
-  .sb-sent-donut-center{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:clamp(14px,1.6vw,18px); font-weight:800;}
+  .sb-sent-donut-center{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:clamp(14px,1.6vw,18px); font-weight:800; pointer-events:none;} /* 텍스트 표시용 — 아래 도넛 링 호버를 막지 않도록 */
   .sb-sent-legend{display:flex; flex-direction:column; gap:6px;}
   .sb-sent-legend-item{display:flex; justify-content:space-between; font-size:13.5px;}
 
@@ -494,6 +510,7 @@
         <div class="sb-spinner"></div>
         <div class="sb-loading-text">📡 데이터 불러오는 중...</div>
       </div>
+      <div class="sb-donut-tooltip" id="sbDonutTooltip"></div>
       <div class="topbar">
         <div>
           <div class="page-title">Social Buzz</div>
@@ -537,21 +554,8 @@
                 <div class="sb-area-legend" id="sbAreaLegend"></div>
               </div>
               <div class="sb-card">
-                <div class="sb-card-title" style="margin-bottom:10px">연관 키워드 SOV <span style="font-size:11.5px;font-weight:500;color:var(--sb-muted);text-transform:none">· 전체 이슈 피드와 동일한 8개 토픽 기준</span></div>
-                <div class="sb-kw-bar-wrap">
-                  <button class="sb-kw-btn active" data-kw="all">전체</button>
-                  <button class="sb-kw-btn" data-kw="시공품질">🔨 시공·품질</button>
-                  <button class="sb-kw-btn" data-kw="투자">💰 투자·분양</button>
-                  <button class="sb-kw-btn" data-kw="거주">🏠 거주환경</button>
-                  <button class="sb-kw-btn" data-kw="브랜드">🏷️ 브랜드·PR</button>
-                  <button class="sb-kw-btn" data-kw="민원">⚠️ 민원·이슈</button>
-                  <button class="sb-kw-btn" data-kw="안전">🦺 안전</button>
-                  <button class="sb-kw-btn" data-kw="ESG">🌱 ESG·사회공헌</button>
-                </div>
-                <div id="sbKwSovChart"></div>
-                <div class="sb-divider" style="margin:16px 0"></div>
-                <div class="sb-card-title" style="margin-bottom:10px">브랜드별 핵심 키워드</div>
-                <div class="sb-brand-kw-list" id="sbBrandKwList"></div>
+                <div class="sb-card-title" style="margin-bottom:10px">연관 키워드 SOV <span style="font-size:11.5px;font-weight:500;color:var(--sb-muted);text-transform:none">· 전체 이슈 피드와 동일한 7개 토픽 기준</span></div>
+                <div class="sb-kw-donut-grid" id="sbKwDonutGrid"></div>
               </div>
             </div>
           </div>
@@ -569,6 +573,7 @@
               </div>
             </div>
           </div>
+          <div class="sb-radar-brand-bar" id="sbRadarBrandBar"></div>
           <div class="sb-health-radar-wrap"><canvas id="sbHealthRadar"></canvas></div>
           <div class="sb-health-grid" id="sbHealthGrid"><div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">📡 데이터 불러오는 중...</div></div>
         </div>
@@ -768,7 +773,7 @@
   }
 
   // 상태
-  var activeBrands = new Set(BRANDS), currentKw = 'all', curSentFilter = 'all', curTopicFilter = 'all', curChannelFilter = 'all';
+  var activeBrands = new Set(BRANDS), radarActiveBrands = new Set(BRANDS), curSentFilter = 'all', curTopicFilter = 'all', curChannelFilter = 'all';
   var areaChartInst = null, healthRadarInst = null, allItems = [], currentHealthScores = null;
   var SOV = {all:{}}, SENT = {all:{}, pos:{}, neg:{}, neu:{}};
   BRANDS.forEach(function(b){ SOV.all[b]=0; SENT.all[b]=0; SENT.pos[b]=0; SENT.neg[b]=0; SENT.neu[b]=0; });
@@ -844,10 +849,24 @@
   }
 
   function applyAll(){
-    renderMainDonut(); renderKwSov(currentKw); renderSentAll(); renderAreaChart(); renderBuzzGrid(allItems);
+    renderMainDonut(); renderKwDonuts(); renderSentAll(); renderAreaChart(); renderBuzzGrid(allItems);
     if(currentHealthScores){ renderHealthGrid(currentHealthScores); renderHealthRadar(currentHealthScores); }
     document.querySelectorAll('#sbHotList .sb-hot-item').forEach(function(el){ el.classList.toggle('hidden', !activeBrands.has(el.dataset.brand)); });
     applyFeedFilter();
+  }
+
+  // 도넛 호버 시 숫자(건수·%) 플로팅 툴팁 — 모든 도넛(전체/감성/연관키워드)에서 공용으로 사용
+  function showDonutTip(e, brand, raw, pct){
+    var tip = document.getElementById('sbDonutTooltip');
+    if(!tip) return;
+    tip.innerHTML = '<b>'+brand+'</b> · '+raw.toLocaleString()+'건 ('+pct+'%)';
+    tip.style.left = (e.clientX+14)+'px';
+    tip.style.top = (e.clientY+14)+'px';
+    tip.style.opacity = '1';
+  }
+  function hideDonutTip(){
+    var tip = document.getElementById('sbDonutTooltip');
+    if(tip) tip.style.opacity = '0';
   }
 
   // 도넛 헬퍼
@@ -859,6 +878,7 @@
     var svg = document.getElementById(svgId); svg.innerHTML = '';
     Object.entries(filtered).sort(function(a,b){return b[1]-a[1];}).forEach(function(pair){
       var brand=pair[0], raw=pair[1], isXi = brand==='자이';
+      var pct = Math.round(raw/total*100);
       var dash=(raw/total)*C, gap=C-dash;
       var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
       c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',r);
@@ -866,6 +886,8 @@
       c.setAttribute('stroke-width', isXi ? (r>30?'16':'13') : (r>30?'12':'9'));
       c.setAttribute('stroke-dasharray', dash+' '+gap);
       c.setAttribute('stroke-dashoffset', String(-offset));
+      c.addEventListener('mousemove', function(ev){ showDonutTip(ev, brand, raw, pct); });
+      c.addEventListener('mouseleave', hideDonutTip);
       svg.appendChild(c); offset += dash;
     });
     return filtered;
@@ -892,38 +914,35 @@
     });
   }
 
-  function renderKwSov(key){
-    currentKw = key;
-    var data = SOV[key] || SOV.all;
-    var filtered = {};
-    Object.keys(data).forEach(function(b){ if(activeBrands.has(b)) filtered[b] = data[b]; });
-    var total = Object.values(filtered).reduce(function(a,b){return a+b;},0) || 1;
-    var c = document.getElementById('sbKwSovChart'); c.innerHTML = '';
-    Object.entries(filtered).sort(function(a,b){return b[1]-a[1];}).forEach(function(pair){
-      var brand=pair[0], raw=pair[1];
-      var pct = Math.round(raw/total*100), isXi = brand==='자이';
-      var row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:7px';
-      row.innerHTML = '<span style="font-size:13px;'+(isXi?'color:var(--sb-xi);font-weight:700':'color:var(--sb-muted)')+';min-width:72px">'+brand+(isXi?' ✦':'')+'</span>'+
-        '<div style="flex:1;height:'+(isXi?5:4)+'px;background:#e7ebec;border-radius:2px"><div style="height:100%;width:'+pct+'%;background:'+BC[brand]+';border-radius:2px"></div></div>'+
-        '<span style="font-size:13px;'+(isXi?'color:var(--sb-xi);font-weight:700':'color:var(--sb-muted)')+';min-width:30px;text-align:right">'+pct+'%</span>';
-      c.appendChild(row);
-    });
-  }
-
   // 연관 키워드 SOV — 전체 이슈 피드/Hot 이슈와 동일하게, 별도 키워드 사전이 아니라
   // AI가 이미 분류해둔 각 글의 topic 배열을 그대로 사용합니다 (분류 결과와 항목명이 어긋나지 않도록).
-  function selectKw(key){
-    document.querySelectorAll('.sb-kw-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.kw===key); });
-    if(key !== 'all' && !SOV[key]){
-      var kd = {}; BRANDS.forEach(function(b){ kd[b]=0; });
-      allItems.forEach(function(i){
-        var topics = (i.topic && i.topic.length) ? i.topic : classifyTopics(i.제목, i.내용요약);
-        if(topics.indexOf(key)!==-1 && kd[i.브랜드]!==undefined) kd[i.브랜드]++;
+  // '전체' 탭은 없애고, 7개 토픽을 각각 원형(도넛) 그래프로 한 번에 보여줍니다.
+  function renderKwDonuts(){
+    var grid = document.getElementById('sbKwDonutGrid'); grid.innerHTML = '';
+    TOPIC_ORDER.forEach(function(tp, idx){
+      var label = TOPIC_LABEL[tp] || tp;
+      var svgId = 'sbKwDonut'+idx, legId = 'sbKwLeg'+idx;
+      var card = document.createElement('div');
+      card.className = 'sb-kw-donut-card';
+      card.innerHTML =
+        '<div class="sb-kw-donut-title">'+label+'</div>'+
+        '<div class="sb-kw-donut-wrap"><svg viewBox="0 0 80 80" id="'+svgId+'"></svg></div>'+
+        '<div class="sb-kw-donut-legend" id="'+legId+'"></div>';
+      grid.appendChild(card);
+    });
+    TOPIC_ORDER.forEach(function(tp, idx){
+      var data = SOV[tp] || {};
+      var filtered = mkDonut('sbKwDonut'+idx, '40', '40', 27, data);
+      var total = Object.values(filtered).reduce(function(a,b){return a+b;},0) || 1;
+      var leg = document.getElementById('sbKwLeg'+idx); leg.innerHTML = '';
+      Object.entries(filtered).sort(function(a,b){return b[1]-a[1];}).slice(0,4).forEach(function(pair){
+        var brand=pair[0], raw=pair[1];
+        var pct = Math.round(raw/total*100), isXi = brand==='자이';
+        leg.innerHTML += '<div class="sb-kw-legend-item"><span class="dot" style="background:'+BC[brand]+'"></span>'+
+          '<span style="'+(isXi?'color:var(--sb-xi);font-weight:700':'')+'">'+brand+'</span>'+
+          '<span style="'+(isXi?'color:var(--sb-xi);font-weight:700':'')+'">'+pct+'%</span></div>';
       });
-      SOV[key] = kd;
-    }
-    renderKwSov(key);
+    });
   }
 
   function renderSentDonut(svgId, legId, sentKey){
@@ -1019,8 +1038,29 @@
     return norm;
   }
 
+  // 다각형(레이더) 그래프에만 적용되는 브랜드 필터 버튼 — 아래 스코어 카드(sbHealthGrid)에는 영향 없음
+  function renderRadarBrandBar(){
+    var bar = document.getElementById('sbRadarBrandBar');
+    if(!bar || bar.dataset.built) return; // 최초 1회만 생성(정적 UI라 데이터 새로고침 때마다 다시 만들 필요 없음)
+    bar.dataset.built = '1';
+    BRANDS.forEach(function(b){
+      var isXi = b === '자이';
+      var btn = document.createElement('button');
+      btn.className = 'sb-radar-brand-btn active';
+      btn.dataset.brand = b;
+      btn.innerHTML = '<span class="dot" style="background:'+BC[b]+'"></span>'+b+(isXi?' ✦':'');
+      btn.addEventListener('click', function(){
+        if(radarActiveBrands.has(b)) radarActiveBrands.delete(b); else radarActiveBrands.add(b);
+        btn.classList.toggle('active', radarActiveBrands.has(b));
+        btn.classList.toggle('inactive', !radarActiveBrands.has(b));
+        if(currentHealthScores) renderHealthRadar(currentHealthScores); // 스코어판(renderHealthGrid)은 건드리지 않음
+      });
+      bar.appendChild(btn);
+    });
+  }
+
   function renderHealthRadar(scores){
-    var abl = BRANDS.filter(function(b){ return activeBrands.has(b); });
+    var abl = BRANDS.filter(function(b){ return activeBrands.has(b) && radarActiveBrands.has(b); });
     if(!abl.length) return;
     var norm = normalizeForRadar(scores, abl);
     var labels = TOPIC_ORDER.map(function(tp){ return (TOPIC_LABEL[tp]||tp); });
@@ -1171,12 +1211,7 @@
 
       MONTHLY_SOV = computeMonthlySOV(curChannelFilter);
 
-      renderMainDonut(); renderKwSov('all'); renderSentAll(); renderAreaChart(); renderBuzzGrid(items);
-      currentHealthScores = calcHealthScores(items);
-      renderHealthGrid(currentHealthScores);
-      renderHealthRadar(currentHealthScores);
-
-      // 연관 키워드 SOV — 표준 토픽별로 미리 한 번 계산해둠 (버튼 클릭 시 재계산 없이 즉시 전환)
+      // 연관 키워드 SOV — 표준 토픽별로 미리 계산 (도넛 렌더보다 먼저 채워둬야 함)
       TOPIC_ORDER.forEach(function(tp){
         var kd = {}; BRANDS.forEach(function(b){ kd[b]=0; });
         items.forEach(function(i){
@@ -1186,30 +1221,10 @@
         SOV[tp] = kd;
       });
 
-      // 브랜드별 핵심 키워드 (주거 도메인 사전 기반 Top10)
-      var HOUSING_DICT = {
-        '시공·품질': ['하자','균열','누수','결로','곰팡이','층간소음','단열','마감','내구성','부실','방음','결함','침수'],
-        '투자·시세': ['시세차익','프리미엄','상승','재건축','재개발','청약','당첨','분양권','갭투자','호가','시세상승','투자가치'],
-        '주거환경':  ['커뮤니티','조경','학군','교통','편의시설','쾌적','녹지','주차','관리비','경관','단지환경','어린이집','헬스장'],
-        '스마트·친환경':['스마트홈','IoT','친환경','에너지','공기질','EV충전','태양광','스마트케어','홈네트워크','스마트'],
-        '긍정 반응': ['좋아요','추천','만족','훌륭','최고','강추','기대','살기좋','완판','선호','인기','호평'],
-        '부정 반응': ['불만','실망','최악','항의','소송','피해','부실시공','하자보수','민원','갑질','불편'],
-      };
-      var ALL_DICT_KWS = Object.values(HOUSING_DICT).flat();
-      var bkm = {}; BRANDS.forEach(function(b){ bkm[b]={}; });
-      items.forEach(function(i){
-        var b=i.브랜드; if(!bkm[b]) return;
-        var text = i.제목+' '+i.내용요약;
-        ALL_DICT_KWS.forEach(function(kw){ if(text.indexOf(kw)!==-1) bkm[b][kw]=(bkm[b][kw]||0)+1; });
-      });
-      var kwListEl = document.getElementById('sbBrandKwList'); kwListEl.innerHTML = '';
-      BRANDS.forEach(function(b){
-        var isXi = b==='자이';
-        var topKws = Object.entries(bkm[b]).sort(function(a,c){return c[1]-a[1];}).slice(0,10).map(function(p){return p[0];});
-        if(!topKws.length) return;
-        var chips = topKws.map(function(w){ return '<span class="sb-brand-chip'+(isXi?' xi':'')+'">'+w+'</span>'; }).join('');
-        kwListEl.innerHTML += '<div class="sb-brand-kw-item"><span class="sb-brand-kw-name" style="'+(isXi?'color:var(--sb-xi)':'')+'">'+b+(isXi?' ✦':'')+'</span><div class="sb-brand-kw-chips">'+chips+'</div></div>';
-      });
+      renderMainDonut(); renderKwDonuts(); renderSentAll(); renderAreaChart(); renderBuzzGrid(items);
+      currentHealthScores = calcHealthScores(items);
+      renderHealthGrid(currentHealthScores);
+      renderHealthRadar(currentHealthScores);
 
       // Hot 이슈 — 브랜드별 최신 1건
       var lb = {};
@@ -1272,7 +1287,6 @@
   }
 
   // 이벤트 바인딩
-  document.querySelectorAll('.sb-kw-btn').forEach(function(b){ b.addEventListener('click', function(){ selectKw(b.dataset.kw); }); });
   document.querySelectorAll('.sb-topic-btn').forEach(function(b){ b.addEventListener('click', function(){ filterTopic(b.dataset.topic); }); });
   document.querySelectorAll('.sb-filter-btn').forEach(function(b){ b.addEventListener('click', function(){ filterSent(b.dataset.sent); }); });
   document.querySelectorAll('.sb-ch-btn').forEach(function(b){ b.addEventListener('click', function(){
@@ -1283,7 +1297,8 @@
   }); });
 
   renderBrandFilter();
-  renderMainDonut(); renderKwSov('all'); renderSentAll(); renderAreaChart();
+  renderRadarBrandBar();
+  renderMainDonut(); renderSentAll(); renderAreaChart();
   loadFromSupabase();
 })();
 </script>
