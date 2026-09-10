@@ -130,6 +130,28 @@
   .sidebar-foot-title{font-size:13.5px; font-weight:700; color:#fff;}
   .sidebar-foot-sub{font-size:12.5px; color:var(--sidebar-text-dim); margin-top:5px; line-height:1.5;}
 
+  /* ---------- 모바일/좁은 화면 — 사이드바를 오버레이 드로어로 전환 ---------- */
+  .sb-mobile-toggle{
+    display:none; position:fixed; top:14px; left:14px; z-index:60;
+    width:38px; height:38px; border-radius:9px; border:1px solid var(--card-border);
+    background:var(--card-bg); color:var(--text-primary); cursor:pointer;
+    align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.12);
+  }
+  .sb-sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(10,15,25,0.45); z-index:55;}
+  @media(max-width:860px){
+    .sb-mobile-toggle{display:flex;}
+    .sidebar{
+      position:fixed; left:0; top:0; z-index:56;
+      transform:translateX(-100%); transition:transform .22s ease;
+      box-shadow:4px 0 24px rgba(0,0,0,0.25);
+    }
+    .sidebar.sb-open{transform:translateX(0);}
+    .sb-sidebar-backdrop.sb-open{display:block;}
+    main{width:100%;}
+    .topbar{padding:20px 18px 16px 60px;} /* 왼쪽 햄버거 버튼과 안 겹치게 */
+    .page-scroll{padding:18px 16px 40px;}
+  }
+
   /* ---------- Main ---------- */
   main{flex:1; min-width:0; display:flex; flex-direction:column;}
   .topbar{
@@ -259,6 +281,26 @@
   }
   .sb-source-pill .dot{width:6px; height:6px; border-radius:99px; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,0.18);}
 
+  /* 기간 조회 */
+  .sb-date-range{display:flex; align-items:center; gap:5px; flex-wrap:wrap;}
+  .sb-date-input{
+    font-size:13px; padding:5px 8px; border-radius:7px; border:1px solid var(--sb-line);
+    background:var(--sb-white); color:var(--sb-ink); font-family:inherit;
+  }
+  .sb-date-tilde{color:var(--sb-muted); font-size:13px;}
+  .sb-date-apply{
+    font-size:13px; font-weight:700; padding:5px 12px; border-radius:7px; border:1px solid var(--sb-xi);
+    background:var(--sb-xi); color:#fff; cursor:pointer; font-family:inherit;
+  }
+  .sb-date-apply:hover{opacity:.9;}
+  @media(max-width:900px){
+    .topbar{flex-wrap:wrap; row-gap:12px;}
+    .topbar-actions{flex:1 1 100%; flex-wrap:wrap; justify-content:flex-start;}
+    .sb-hot-item{flex-wrap:wrap;}
+    .sb-hot-title{flex:1 1 100%; order:2;}
+    .sb-hot-meta{order:3; flex:1 1 100%;}
+  }
+
   .sb-section{margin-bottom:30px;}
   .sb-section-label{
     font-size:16px; font-weight:800; color:var(--sb-navy); margin-bottom:14px;
@@ -289,7 +331,7 @@
   }
   .sb-xi-card{border-color:rgba(31,95,139,0.35)!important; background:linear-gradient(145deg,rgba(31,95,139,0.05),var(--sb-white))!important;}
 
-  .sb-sov-grid{display:grid; grid-template-columns:380px 1fr; gap:14px;}
+  .sb-sov-grid{display:grid; grid-template-columns:minmax(0,380px) minmax(0,1fr); gap:14px;}
   .sb-donut-wrap{position:relative; width:clamp(180px,20vw,260px); height:clamp(180px,20vw,260px); margin:0 auto 18px;}
   .sb-donut-wrap svg{width:100%; height:100%; transform:rotate(-90deg);}
   .sb-donut-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;} /* 텍스트 표시용 — 아래 도넛 링 호버를 막지 않도록 */
@@ -461,8 +503,13 @@
   @media(max-width:900px){.sb-sent-grid{grid-template-columns:repeat(2,1fr);} .sb-feed-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 
+<button class="sb-mobile-toggle" id="sbMobileToggle" aria-label="메뉴 열기">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+</button>
+<div class="sb-sidebar-backdrop" id="sbSidebarBackdrop"></div>
+
 <div class="app">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sbSidebar">
     <div class="brand">
       <div class="brand-mark"><img src="data:image/png;base64,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" alt="Xi"></div>
       <div class="brand-text">
@@ -517,6 +564,12 @@
           <div class="page-desc">네이버, 카카오의 웹페이지, 카페, 블로그 3개 채널의 버즈량을 수집하여 분석합니다.</div>
         </div>
         <div class="topbar-actions">
+          <div class="sb-date-range">
+            <input type="date" id="sbDateFrom" class="sb-date-input">
+            <span class="sb-date-tilde">~</span>
+            <input type="date" id="sbDateTo" class="sb-date-input">
+            <button class="sb-date-apply" id="sbDateApply">조회</button>
+          </div>
           <span class="sb-source-pill"><span class="dot"></span>Supabase 연동</span>
           <span id="sbUpdateTime" class="pending-pill" style="color:var(--text-secondary); background:var(--content-bg);"></span>
         </div>
@@ -706,11 +759,21 @@
       try{ localStorage.setItem('xi-otm-last-page', id); }catch(e){}
     }
 
+    // 모바일(≤860px)에서 사이드바를 오버레이 드로어로 여닫기
+    var sidebar = document.getElementById('sbSidebar');
+    var toggleBtn = document.getElementById('sbMobileToggle');
+    var backdrop = document.getElementById('sbSidebarBackdrop');
+    function closeSidebar(){ sidebar.classList.remove('sb-open'); backdrop.classList.remove('sb-open'); }
+    function toggleSidebar(){ sidebar.classList.toggle('sb-open'); backdrop.classList.toggle('sb-open'); }
+    if(toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+    if(backdrop) backdrop.addEventListener('click', closeSidebar);
+
     navItems.forEach(function(n){
       if(n.classList.contains('disabled')) return;
       n.addEventListener('click', function(){
         show(n.dataset.page);
         location.hash = n.dataset.page;
+        closeSidebar(); // 모바일에서 메뉴 선택하면 드로어 자동으로 닫기
       });
     });
 
@@ -749,7 +812,8 @@
   // 안전한 키(anon, RLS로 읽기 전용만 허용됨)라서 그대로 코드에 둡니다.
   var SUPABASE_URL      = 'https://uzvhchqdzhudleejbbwc.supabase.co';
   var SUPABASE_ANON_KEY = 'sb_publishable_f6Q3yQ_SzaHqDnnPhSgm8w_O-TflDu6';
-  var DATA_FROM   = '2025-01-01';
+  // 조회 기간 — 기간 조회 UI로 사용자가 바꿀 수 있음. 디폴트: 2026-01-01 ~ 어제.
+  var filterFrom = '2026-01-01', filterTo = '';
 
   // 토픽 필터 — 기존 5개(시공품질/투자/거주/브랜드/민원) 그대로 + 안전 · ESG·사회공헌 신규 추가
   var TOPIC_KW = {
@@ -780,20 +844,27 @@
 
   // 월별 계산 (기존엔 주차 단위였으나, 기간이 길어지면서 월 단위로 보는 게 더 읽기 편해서 변경)
   function fmt(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-  var MONTHLY_KEYS = [];
-  (function(){
-    var sY=+DATA_FROM.slice(0,4), sM=+DATA_FROM.slice(5,7);
-    var now=new Date(), nY=now.getFullYear(), nM=now.getMonth()+1;
+  function yesterday(){ var d=new Date(); d.setDate(d.getDate()-1); return fmt(d); }
+  filterTo = yesterday();
+
+  // 조회 기간(filterFrom~filterTo)이 바뀔 때마다 월별 추이용 라벨/버킷을 다시 만듦
+  var MONTHLY_KEYS = [], MONTHLY_LABELS = [], TOTAL = 0, MONTHLY_SOV = {};
+  function rebuildMonthlyKeys(){
+    MONTHLY_KEYS = [];
+    var sY=+filterFrom.slice(0,4), sM=+filterFrom.slice(5,7);
+    var eY=+filterTo.slice(0,4), eM=+filterTo.slice(5,7);
     var y=sY, m=sM;
-    while(y<nY || (y===nY && m<=nM)){
+    while(y<eY || (y===eY && m<=eM)){
       MONTHLY_KEYS.push(y+'-'+String(m).padStart(2,'0'));
       m++; if(m>12){ m=1; y++; }
     }
-  })();
-  var MONTHLY_LABELS = MONTHLY_KEYS.map(function(k){ return (+k.slice(5,7))+'월'; });
-  var TOTAL = MONTHLY_KEYS.length;
-  var MONTHLY_SOV = {};
-  BRANDS.forEach(function(b){ MONTHLY_SOV[b] = Array(TOTAL).fill(0); });
+    if(!MONTHLY_KEYS.length) MONTHLY_KEYS.push(filterTo.slice(0,7)); // from > to 등 이상값 대비 최소 1개월 보장
+    MONTHLY_LABELS = MONTHLY_KEYS.map(function(k){ return (+k.slice(5,7))+'월'; });
+    TOTAL = MONTHLY_KEYS.length;
+    MONTHLY_SOV = {};
+    BRANDS.forEach(function(b){ MONTHLY_SOV[b] = Array(TOTAL).fill(0); });
+  }
+  rebuildMonthlyKeys();
 
   // 채널 유형 판별 — '네이버·페이지'/'카카오·페이지' 둘 다 '웹페이지'로 묶어서 봄
   function channelType(ch){
@@ -1180,6 +1251,18 @@
     return all;
   }
 
+  var allItemsRaw = []; // 날짜 필터 적용 전 원본(장르/브랜드/뉴스 필터만 거친 상태) — 기간 조회 시 재요청 없이 다시 필터링
+
+  // 조회 기간 변경 시 재요청 없이 로컬에서 다시 필터링 + 전체 재렌더
+  function applyDateFilter(){
+    if(!allItemsRaw.length) return;
+    var filtered = allItemsRaw.filter(function(i){
+      return !i.작성일 || (i.작성일>=filterFrom && i.작성일<=filterTo);
+    });
+    rebuildMonthlyKeys();
+    renderFromItems(filtered);
+  }
+
   async function loadFromSupabase(){
     try{
       var rows = await fetchAllBuzzRows();
@@ -1187,7 +1270,7 @@
         document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">수집된 데이터가 없어요. collector.py를 실행해주세요.</div>';
         return;
       }
-      var items = rows.map(function(r){
+      allItemsRaw = rows.map(function(r){
         return {
           수집일시: r.collected_at||'', 작성일:r.published_at||'', 채널:r.channel||'', 브랜드:r.brand||'',
           제목:r.title||'', 내용요약:r.summary||'', 감성:r.sentiment||'중립',
@@ -1196,8 +1279,21 @@
         };
       }).filter(function(i){
         var isNews = i.채널 && i.채널.indexOf('뉴스') !== -1; // 뉴스는 수집은 되지만 이 페이지엔 표시 안 함
-        return i._genuine && i.제목 && !isNews && (!i.작성일 || i.작성일>=DATA_FROM) && BRANDS.indexOf(i.브랜드)!==-1;
+        return i._genuine && i.제목 && !isNews && BRANDS.indexOf(i.브랜드)!==-1;
       });
+      applyDateFilter();
+      updateTime();
+    }catch(e){
+      console.error('Supabase 로드 오류:', e);
+      document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">⚠️ 데이터 로드 실패. Supabase 연결/권한 설정을 확인해주세요.</div>';
+    }finally{
+      var ov = document.getElementById('sbLoadingOverlay');
+      if(ov) ov.classList.add('sb-hidden');
+    }
+  }
+
+  // 기간 필터를 통과한 items로 전체 대시보드를 렌더 — 최초 로드/기간 재조회 양쪽에서 공용으로 사용
+  function renderFromItems(items){
       allItems = items;
 
       BRANDS.forEach(function(b){ SOV.all[b]=0; });
@@ -1275,15 +1371,7 @@
       });
 
       applyFeedFilter();
-      updateTime();
-      console.log('✅ Social Buzz: '+items.length+'개 로드 완료');
-    }catch(e){
-      console.error('Supabase 로드 오류:', e);
-      document.getElementById('sbFeedGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sb-muted);font-size:15px">⚠️ 데이터 로드 실패. Supabase 연결/권한 설정을 확인해주세요.</div>';
-    }finally{
-      var ov = document.getElementById('sbLoadingOverlay');
-      if(ov) ov.classList.add('sb-hidden');
-    }
+      console.log('✅ Social Buzz: '+items.length+'개 로드 완료 ('+filterFrom+' ~ '+filterTo+')');
   }
 
   // 이벤트 바인딩
@@ -1295,6 +1383,21 @@
     MONTHLY_SOV = computeMonthlySOV(curChannelFilter);
     renderAreaChart();
   }); });
+
+  // 기간 조회 — 입력값 초기화(디폴트: 2026-01-01 ~ 어제) 및 '조회' 클릭 바인딩
+  (function(){
+    var fromEl = document.getElementById('sbDateFrom'), toEl = document.getElementById('sbDateTo');
+    var applyBtn = document.getElementById('sbDateApply');
+    if(!fromEl || !toEl || !applyBtn) return;
+    fromEl.value = filterFrom; toEl.value = filterTo;
+    applyBtn.addEventListener('click', function(){
+      var f = fromEl.value, t = toEl.value;
+      if(!f || !t){ alert('조회 시작일과 종료일을 모두 선택해주세요.'); return; }
+      if(f > t){ alert('시작일이 종료일보다 늦을 수 없어요.'); return; }
+      filterFrom = f; filterTo = t;
+      applyDateFilter();
+    });
+  })();
 
   renderBrandFilter();
   renderRadarBrandBar();
