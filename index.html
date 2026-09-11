@@ -301,6 +301,51 @@
     .sb-hot-meta{order:3; flex:1 1 100%;}
   }
 
+  /* Raw Data 보기 (읽기 전용) */
+  .sb-rawdata-btn{
+    font-size:13px; font-weight:700; padding:5px 12px; border-radius:7px; border:1px solid var(--sb-line);
+    background:var(--sb-white); color:var(--sb-ink); cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:5px;
+  }
+  .sb-rawdata-btn:hover{background:#eef3f5;}
+  .sb-rawdata-overlay{
+    display:none; position:fixed; inset:0; background:rgba(10,15,25,0.55); z-index:200;
+    align-items:center; justify-content:center; padding:24px;
+  }
+  .sb-rawdata-overlay.sb-open{display:flex;}
+  .sb-rawdata-panel{
+    background:var(--sb-white); border-radius:14px; width:min(1100px, 100%); max-height:min(720px, 90vh);
+    display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden;
+  }
+  .sb-rawdata-header{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--sb-line);}
+  .sb-rawdata-title{font-size:16px; font-weight:800; color:var(--sb-ink); display:flex; align-items:center; gap:8px;}
+  .sb-rawdata-readonly-badge{font-size:11px; font-weight:700; color:var(--sb-muted); background:#eef3f5; border-radius:99px; padding:3px 9px;}
+  .sb-rawdata-close{width:30px; height:30px; border-radius:8px; border:none; background:transparent; color:var(--sb-muted); font-size:16px; cursor:pointer;}
+  .sb-rawdata-close:hover{background:#eef3f5;}
+  .sb-rawdata-toolbar{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 20px; border-bottom:1px solid var(--sb-line);}
+  .sb-rawdata-search{flex:1 1 auto; max-width:320px; font-size:13px; padding:6px 10px; border-radius:7px; border:1px solid var(--sb-line); font-family:inherit;}
+  .sb-rawdata-count{font-size:12.5px; color:var(--sb-muted); flex:0 0 auto; white-space:nowrap;}
+  .sb-rawdata-table-wrap{flex:1 1 auto; overflow:auto;}
+  .sb-rawdata-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .sb-rawdata-table thead th{
+    position:sticky; top:0; background:var(--sb-white); text-align:left; padding:9px 10px;
+    border-bottom:2px solid var(--sb-line); color:var(--sb-muted); font-weight:700; white-space:nowrap;
+  }
+  .sb-rawdata-table tbody td{padding:8px 10px; border-bottom:1px solid var(--sb-line); color:var(--sb-ink); vertical-align:top;}
+  .sb-rawdata-table tbody tr:hover{background:#f7f9fa;}
+  .sb-rawdata-td-title{max-width:360px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .sb-rawdata-td-date{white-space:nowrap; color:var(--sb-muted);}
+  .sb-rawdata-td-date.sb-rawdata-unknown{color:#c0392b; font-style:italic;}
+  .sb-rawdata-sent-pos{color:#1a7f5a; font-weight:700;}
+  .sb-rawdata-sent-neg{color:#c0392b; font-weight:700;}
+  .sb-rawdata-sent-neu{color:var(--sb-muted);}
+  .sb-rawdata-link{color:var(--sb-xi); text-decoration:none; font-size:12px;}
+  .sb-rawdata-link:hover{text-decoration:underline;}
+  .sb-rawdata-footer{padding:10px 20px; border-top:1px solid var(--sb-line); font-size:12px; color:var(--sb-muted); text-align:center;}
+  @media(max-width:640px){
+    .sb-rawdata-panel{max-height:95vh;}
+    .sb-rawdata-td-title{max-width:160px;}
+  }
+
   .sb-section{margin-bottom:30px;}
   .sb-section-label{
     font-size:16px; font-weight:800; color:var(--sb-navy); margin-bottom:14px;
@@ -564,6 +609,7 @@
           <div class="page-desc">네이버, 카카오의 웹페이지, 카페, 블로그 3개 채널의 버즈량을 수집하여 분석합니다.</div>
         </div>
         <div class="topbar-actions">
+          <button class="sb-rawdata-btn" id="sbRawDataBtn">🗂️ Raw Data</button>
           <div class="sb-date-range">
             <input type="date" id="sbDateFrom" class="sb-date-input">
             <span class="sb-date-tilde">~</span>
@@ -572,6 +618,31 @@
           </div>
           <span class="sb-source-pill"><span class="dot"></span>Supabase 연동</span>
           <span id="sbUpdateTime" class="pending-pill" style="color:var(--text-secondary); background:var(--content-bg);"></span>
+        </div>
+      </div>
+
+      <!-- Raw Data 모달 (읽기 전용 — 지금 대시보드가 쓰고 있는 필터 적용 데이터 그대로 표시) -->
+      <div class="sb-rawdata-overlay" id="sbRawDataOverlay">
+        <div class="sb-rawdata-panel">
+          <div class="sb-rawdata-header">
+            <div class="sb-rawdata-title">🗂️ Raw Data <span class="sb-rawdata-readonly-badge">읽기 전용</span></div>
+            <button class="sb-rawdata-close" id="sbRawDataClose" aria-label="닫기">✕</button>
+          </div>
+          <div class="sb-rawdata-toolbar">
+            <input type="text" id="sbRawDataSearch" class="sb-rawdata-search" placeholder="제목/브랜드/채널 검색...">
+            <span class="sb-rawdata-count" id="sbRawDataCount"></span>
+          </div>
+          <div class="sb-rawdata-table-wrap">
+            <table class="sb-rawdata-table">
+              <thead>
+                <tr>
+                  <th>게시일</th><th>채널</th><th>브랜드</th><th>제목</th><th>감성</th><th>토픽</th><th>원문</th>
+                </tr>
+              </thead>
+              <tbody id="sbRawDataBody"></tbody>
+            </table>
+          </div>
+          <div class="sb-rawdata-footer" id="sbRawDataFooter"></div>
         </div>
       </div>
       <div class="page-scroll">
@@ -1063,7 +1134,10 @@
 
   // 브랜드 경쟁력 스코어 — 전체 이슈 피드와 동일한 7개 표준 토픽을 그대로 사용합니다.
   // (예전엔 별도 키워드 사전(FKW)으로 즉석 계산해서 피드의 토픽 분류와 항목명·기준이 어긋났음)
-  // 각 요인 = 그 토픽으로 분류된 버즈 중 (긍정 − 부정) 비율 → 50점 기준 0~100점 환산.
+  // v3 (2026-09-11): 각 요인 공식을 "50+(긍정-부정)/전체×50"에서 "긍정/(긍정+부정)×100"으로 변경.
+  // (중립은 계산에서 빼고 긍정 vs 부정만 비교) — 사용자 요청으로 단순화한 방식으로 우선 테스트.
+  // ⚠️ 참고: 이 공식도 "비율"이라 이전 공식과 마찬가지로 절대 건수 차이는 반영하지 않음
+  // (예: 부정 360건인 브랜드와 부정 142건인 브랜드가 비율이 같으면 점수도 같게 나옴).
   function calcHealthScores(items){
     var scores = {};
     BRANDS.forEach(function(b){
@@ -1076,14 +1150,15 @@
         var n = rel.length;
         var pos = rel.filter(function(i){return i.감성==='긍정';}).length;
         var neg = rel.filter(function(i){return i.감성==='부정';}).length;
-        var raw = n ? Math.round(50 + (pos-neg)/n*50) : 50;
+        var denom = pos + neg;
+        var raw = denom ? Math.round(pos/denom*100) : 50; // 긍정+부정이 둘 다 0이면 중립 50점
         raw = Math.max(0, Math.min(100, raw));
         var label = TOPIC_LABEL[tp] || tp; // 예: '🔨 시공·품질'
         var sp = label.indexOf(' ');
         return {
           topic: tp, icon: sp>-1?label.slice(0,sp):'', name: sp>-1?label.slice(sp+1):label,
           val: raw, n: n, pos: pos, neg: neg,
-          detail: '해당 토픽 버즈 '+n+'건 중 긍정 '+pos+'건 − 부정 '+neg+'건 → 50+('+(pos-neg)+'/'+(n||1)+')×50 = '+raw+'점'
+          detail: '해당 토픽 버즈 '+n+'건 중 긍정 '+pos+'건 · 부정 '+neg+'건 → 긍정/(긍정+부정)×100 = '+raw+'점'
         };
       });
       var total = Math.round(factors.reduce(function(s,f){return s+f.val;},0)/factors.length);
@@ -1378,7 +1453,58 @@
       });
 
       applyFeedFilter();
+      renderRawDataTable(); // Raw Data 모달도 현재 필터 적용된 데이터로 갱신
       console.log('✅ Social Buzz: '+items.length+'개 로드 완료 ('+filterFrom+' ~ '+filterTo+')');
+  }
+
+  // ── Raw Data 보기 (읽기 전용) ────────────────────────────
+  // 대시보드가 지금 쓰고 있는 필터 적용 데이터(allItems)를 그대로 테이블로 노출.
+  // 성능을 위해 화면엔 최대 RAWDATA_MAX_ROWS건만 그리고, 검색어가 있으면 그 안에서 필터링.
+  var RAWDATA_MAX_ROWS = 500;
+
+  function escapeHtml(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function renderRawDataTable(){
+    var body = document.getElementById('sbRawDataBody');
+    var countEl = document.getElementById('sbRawDataCount');
+    var footEl = document.getElementById('sbRawDataFooter');
+    if(!body) return; // 아직 데이터 로드 전이면 스킵
+
+    var q = (document.getElementById('sbRawDataSearch').value || '').trim().toLowerCase();
+    var source = allItems || [];
+    var filtered = q ? source.filter(function(i){
+      return (i.제목||'').toLowerCase().indexOf(q)!==-1 ||
+             (i.브랜드||'').toLowerCase().indexOf(q)!==-1 ||
+             (i.채널||'').toLowerCase().indexOf(q)!==-1;
+    }) : source;
+
+    var shown = filtered.slice(0, RAWDATA_MAX_ROWS);
+    body.innerHTML = shown.map(function(i){
+      var dateHtml = i.작성일
+        ? '<span class="sb-rawdata-td-date">'+escapeHtml(i.작성일)+'</span>'
+        : '<span class="sb-rawdata-td-date sb-rawdata-unknown">미상</span>';
+      var sentClass = i.감성==='긍정' ? 'sb-rawdata-sent-pos' : (i.감성==='부정' ? 'sb-rawdata-sent-neg' : 'sb-rawdata-sent-neu');
+      var topics = (i.topic && i.topic.length) ? i.topic.join(', ') : '';
+      var link = i.원문URL ? '<a class="sb-rawdata-link" href="'+escapeHtml(i.원문URL)+'" target="_blank" rel="noopener noreferrer">열기↗</a>' : '';
+      return '<tr>'+
+        '<td>'+dateHtml+'</td>'+
+        '<td>'+escapeHtml(i.채널)+'</td>'+
+        '<td>'+escapeHtml(i.브랜드)+'</td>'+
+        '<td class="sb-rawdata-td-title" title="'+escapeHtml(i.제목)+'">'+escapeHtml(i.제목)+'</td>'+
+        '<td class="'+sentClass+'">'+escapeHtml(i.감성)+'</td>'+
+        '<td>'+escapeHtml(topics)+'</td>'+
+        '<td>'+link+'</td>'+
+      '</tr>';
+    }).join('');
+
+    countEl.textContent = q
+      ? ('검색결과 '+filtered.length.toLocaleString()+'건 (전체 '+source.length.toLocaleString()+'건 중)')
+      : ('전체 '+source.length.toLocaleString()+'건');
+    footEl.textContent = filtered.length > RAWDATA_MAX_ROWS
+      ? ('상위 '+RAWDATA_MAX_ROWS.toLocaleString()+'건만 표시 중 — 더 좁혀서 검색해주세요.')
+      : ('표시 중: '+shown.length.toLocaleString()+'건 · 지금 대시보드에 적용된 기간·필터와 동일한 데이터입니다.');
   }
 
   // 이벤트 바인딩
@@ -1390,6 +1516,24 @@
     MONTHLY_SOV = computeMonthlySOV(curChannelFilter);
     renderAreaChart();
   }); });
+
+  // Raw Data 모달 — 열기/닫기/검색 바인딩 (읽기 전용: 셀 클릭·수정 기능 없음, 원문 링크만 새 탭으로 열림)
+  (function(){
+    var btn = document.getElementById('sbRawDataBtn');
+    var overlay = document.getElementById('sbRawDataOverlay');
+    var closeBtn = document.getElementById('sbRawDataClose');
+    var searchEl = document.getElementById('sbRawDataSearch');
+    if(!btn || !overlay || !closeBtn || !searchEl) return;
+
+    function open(){ overlay.classList.add('sb-open'); renderRawDataTable(); }
+    function close(){ overlay.classList.remove('sb-open'); }
+
+    btn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); }); // 바깥 클릭 시 닫힘
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && overlay.classList.contains('sb-open')) close(); });
+    searchEl.addEventListener('input', renderRawDataTable);
+  })();
 
   // 기간 조회 — 입력값 초기화(디폴트: 2026-01-01 ~ 어제) 및 '조회' 클릭 바인딩
   (function(){
