@@ -606,7 +606,7 @@
       <div class="topbar">
         <div>
           <div class="page-title">Social Buzz</div>
-          <div class="page-desc">네이버, 카카오의 웹페이지, 카페, 블로그 3개 채널의 버즈량을 수집하여 분석합니다.</div>
+          <div class="page-desc">네이버 웹페이지, 카페, 블로그 3개 채널 / 카카오 웹페이지, 카페, 블로그 3개 채널에서 수집해 분석합니다. (네이버 웹페이지·카페·블로그 3개 채널은 게시일 수집이 불가능해 기간별 집계에서 제외)</div>
         </div>
         <div class="topbar-actions">
           <button class="sb-rawdata-btn" id="sbRawDataBtn">🗂️ Raw Data</button>
@@ -1336,10 +1336,13 @@
   var allItemsRaw = []; // 날짜 필터 적용 전 원본(장르/브랜드/뉴스 필터만 거친 상태) — 기간 조회 시 재요청 없이 다시 필터링
 
   // 조회 기간 변경 시 재요청 없이 로컬에서 다시 필터링 + 전체 재렌더
+  // v2 (2026-09-11): 게시일 없는 데이터는 기간 필터를 항상 통과시키던 것(!i.작성일 || ...)을
+  // 제외로 변경 — 네이버 웹페이지·카페·블로그는 게시일 수집이 불가능해 전량 NULL이라,
+  // 이 채널들의 데이터는 이제 대시보드 집계에서 빠짐(page-desc에 안내 문구 추가함).
   function applyDateFilter(){
     if(!allItemsRaw.length) return;
     var filtered = allItemsRaw.filter(function(i){
-      return !i.작성일 || (i.작성일>=filterFrom && i.작성일<=filterTo);
+      return i.작성일 && i.작성일>=filterFrom && i.작성일<=filterTo;
     });
     rebuildMonthlyKeys();
     renderFromItems(filtered);
